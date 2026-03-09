@@ -1,0 +1,127 @@
+﻿[33mΓ¥»[39m Building...
+[32mΓ£ö[39m Building...
+Application bundle generation failed. [3.353 seconds] - 2026-03-09T04:25:21.607Z
+
+node.exe : 
+[1m[31m[31mX [41;3
+1m[[41;97mERROR[41;3
+1m][0m [1mNG2008: 
+Could not find 
+stylesheet file './log
+in.component.css'.[0m
+ [1m[35m[plugin 
+angular-compiler][0m
+At C:\Users\harsh\AppD
+ata\Roaming\npm\npx.ps
+1:24 char:5
++     & "node$exe"  "$
+basedir/node_modules/n
+pm/bin/npx-cli.js" 
+$args
++     ~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ([1m[31m   
+ [31mX...r-compile    
+r][0m:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+
+    src/app/features/a
+uth/login/login.compon
+ent.ts:23:16:
+[37m      23 Γöé     
+styleUrls: [[32m'./lo
+gin.component.css'[37
+m]
+         Γò╡          
+       [32m~~~~~~~~~~
+~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;9
+7mERROR[41;31m][0m 
+[1mNG2008: Could not 
+find stylesheet file '
+./user-form.component.
+css'.[0m 
+[1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/u
+ser-management/user-fo
+rm/user-form.component
+.ts:25:16:
+[37m      25 Γöé     
+styleUrls: [[32m'./us
+er-form.component.css'
+[37m]
+         Γò╡          
+       [32m~~~~~~~~~~
+~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;9
+7mERROR[41;31m][0m 
+[1mNG2008: Could not 
+find stylesheet file '
+./user-list.component.
+css'.[0m 
+[1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/u
+ser-management/user-li
+st/user-list.component
+.ts:25:16:
+[37m      25 Γöé     
+styleUrls: [[32m'./us
+er-list.component.css'
+[37m]
+         Γò╡          
+       [32m~~~~~~~~~~
+~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;9
+7mERROR[41;31m][0m 
+[1mCould not resolve 
+"@angular/animations/b
+rowser"[0m
+
+    node_modules/@angu
+lar/platform-browser/f
+esm2022/animations-asy
+nc.mjs:37:53:
+[37m      37 Γöé 
+....moduleImpl ?? impo
+rt([32m'@angular/anim
+ations/browser'[37m).
+then(m => m);
+         Γò╡          
+                [32m~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~[0m
+
+  You can mark the 
+path "@angular/animati
+ons/browser" as 
+external to exclude 
+it from the bundle, 
+which will remove 
+this error and leave 
+the unresolved path 
+in the bundle. You 
+can also add 
+".catch()" here to 
+handle this failure 
+at run-time instead 
+of bundle-time.
+
+[39m[22m

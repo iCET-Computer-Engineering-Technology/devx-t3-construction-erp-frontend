@@ -1,0 +1,38 @@
+<div class="login-container flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+  <mat-card class="login-card w-full max-w-md p-6 shadow-xl rounded-xl">
+    <mat-card-header class="flex justify-center mb-6">
+      <mat-card-title class="text-2xl font-bold dark:text-white">Construction ERP Admin</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+        
+        <div *ngIf="errorMessage" class="error-banner bg-red-100 text-red-700 p-3 rounded-md mb-4 text-center">
+          {{ errorMessage }}
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="admin@example.com" />
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email') && !loginForm.get('email')?.hasError('required')">
+            Please enter a valid email address
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            Email is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" placeholder="Enter your password" />
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Password is <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="submit" class="w-full py-2 mt-4" [disabled]="isLoading">
+          {{ isLoading ? 'Signing In...' : 'Sign In' }}
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -112,10 +112,10 @@ export class AuthService {
         const decoded = this.decodeToken(token);
         console.log('Decoded Token:', decoded);
         if (!decoded) return null;
-        
+
         // Handle various ways the role might be stored in the JWT payload from different backends
         let role = decoded.role || decoded.roles?.[0] || decoded.authority || decoded.authorities?.[0];
-        
+
         // TEMPORARY FIX: If the backend's JWT doesn't include a role (e.g. only contains 'sub'), default to ADMIN so you can log in.
         if (!role && decoded.sub) {
             console.warn('No role found in JWT! Defaulting to ADMIN based on sub.');

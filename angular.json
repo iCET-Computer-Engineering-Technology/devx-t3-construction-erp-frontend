@@ -25,7 +25,11 @@
                 "input": "public"
               }
             ],
+            "polyfills": [
+              "zone.js"
+            ],
             "styles": [
+              "src/material-theme.scss",
               "src/styles.css"
             ]
           },
@@ -55,6 +59,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "construction-erp-frontend:build:production"

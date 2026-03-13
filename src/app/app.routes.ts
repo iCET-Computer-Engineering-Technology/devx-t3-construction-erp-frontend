@@ -9,7 +9,12 @@ export const routes: Routes = [
     },
     {
         path: 'dashboard',
-        loadComponent: () => import('./features/user-management/user-list/user-list.component').then(c => c.UserListComponent),
+        loadComponent: () => import('./features/dashboard/dashboard.component').then(c => c.DashboardComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'projects',
+        loadComponent: () => import('./features/projects/projects.component').then(c => c.ProjectsComponent),
         canActivate: [authGuard]
     },
     {

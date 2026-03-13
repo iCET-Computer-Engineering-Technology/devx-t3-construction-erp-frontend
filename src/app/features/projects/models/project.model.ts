@@ -5,6 +5,7 @@ export interface Project {
   location: string;
   status: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'PLANNING' | 'CANCELLED';
   manager: string;
+  managerId?: number | string;
   managerInitials: string;
   startDate: string;
   endDate: string;

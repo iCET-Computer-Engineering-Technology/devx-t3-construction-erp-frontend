@@ -1,0 +1,39 @@
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m  [2m | [22m[1mNames[22m              [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-TDY5EM6X.js[39m    [2m | [22m[2m-[22m                  [2m | [22m[36m171.57 kB[39m[2m | [22m               [36m49.79 kB[39m
+[32mchunk-SHKYGSNF.js[39m    [2m | [22m[2m-[22m                  [2m | [22m [36m98.80 kB[39m[2m | [22m               [36m25.76 kB[39m
+[32mchunk-4MR522JK.js[39m    [2m | [22m[2m-[22m                  [2m | [22m [36m78.40 kB[39m[2m | [22m               [36m19.61 kB[39m
+[32mchunk-7KAQ2OWJ.js[39m    [2m | [22m[2m-[22m                  [2m | [22m [36m40.70 kB[39m[2m | [22m                [36m8.52 kB[39m
+[32mpolyfills-DOYHMSTV.js[39m[2m | [22m[2mpolyfills[22m          [2m | [22m [36m35.73 kB[39m[2m | [22m               [36m11.58 kB[39m
+[32mmain-OOHWW2WZ.js[39m     [2m | [22m[2mmain[22m               [2m | [22m [36m25.33 kB[39m[2m | [22m                [36m6.74 kB[39m
+[32mstyles-OUYNHR42.css[39m  [2m | [22m[2mstyles[22m             [2m | [22m [36m18.92 kB[39m[2m | [22m                [36m3.82 kB[39m
+[32mchunk-SIG3HMN6.js[39m    [2m | [22m[2m-[22m                  [2m | [22m [36m16.52 kB[39m[2m | [22m                [36m4.22 kB[39m
+[32mchunk-6LCDSBB7.js[39m    [2m | [22m[2m-[22m                  [2m | [22m  [36m1.24 kB[39m[2m | [22m              [36m469 bytes[39m
+[32mchunk-ABT7VUSZ.js[39m    [2m | [22m[2m-[22m                  [2m | [22m[36m166 bytes[39m[2m | [22m              [36m166 bytes[39m
+[32mchunk-I6HKTPVT.js[39m    [2m | [22m[2m-[22m                  [2m | [22m  [36m0 bytes[39m[2m | [22m                [36m0 bytes[39m
+
+[1m [22m                    [2m | [22m[1mInitial total[22m      [2m | [22m[1m487.36 kB[22m[2m | [22m              [1m130.69 kB[22m
+
+[1mLazy chunk files[22m     [2m | [22m[1mNames[22m              [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-GKDBQVQB.js[39m    [2m | [22m[2muser-list-component[22m[2m | [22m[36m178.88 kB[39m[2m | [22m               [36m30.89 kB[39m
+[32mchunk-ZJNBV6NT.js[39m    [2m | [22m[2m-[22m                  [2m | [22m [36m85.67 kB[39m[2m | [22m               [36m18.90 kB[39m
+[32mchunk-H2RQGXVX.js[39m    [2m | [22m[2mbrowser[22m            [2m | [22m [36m67.75 kB[39m[2m | [22m               [36m17.77 kB[39m
+[32mchunk-WANKF34T.js[39m    [2m | [22m[2mlogin-component[22m    [2m | [22m [36m39.67 kB[39m[2m | [22m                [36m7.93 kB[39m
+[32mchunk-QACWATJW.js[39m    [2m | [22m[2mprojects-component[22m [2m | [22m [36m32.24 kB[39m[2m | [22m                [36m7.54 kB[39m
+[32mchunk-V42NF2UW.js[39m    [2m | [22m[2mdashboard-component[22m[2m | [22m [36m14.95 kB[39m[2m | [22m                [36m3.76 kB[39m
+
+Application bundle generation failed. [5.406 seconds] - 2026-03-14T10:12:12.028Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/features/dashboard/dashboard.component.css exceeded maximum budget. Budget 4.00 kB was not met by 1.71 kB with a total of 5.71 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/features/auth/login/login.component.css exceeded maximum budget. Budget 4.00 kB was not met by 1.04 kB with a total of 5.04 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/features/projects/projects.component.css exceeded maximum budget. Budget 4.00 kB was not met by 5.07 kB with a total of 9.06 kB.[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1msrc/app/features/projects/projects.component.css exceeded maximum budget. Budget 8.00 kB was not met by 1.06 kB with a total of 9.06 kB.[0m
+
+[39m[22m

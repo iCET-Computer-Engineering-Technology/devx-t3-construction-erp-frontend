@@ -94,14 +94,12 @@ export class ProjectsComponent {
     });
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
-      const initials = (result.manager as string)
-        .split(' ')
-        .map((n: string) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
+      const managerStr = String(result.managerId || 'PM');
+      const initials = managerStr.slice(0, 2).toUpperCase();
       this.projectService.addProject({
         ...result,
+        manager: managerStr,
+        managerId: result.managerId,
         managerInitials: initials,
         budgetUsed: '$0',
         budgetStatus: 'On Track',
@@ -124,13 +122,9 @@ export class ProjectsComponent {
     });
     ref.afterClosed().subscribe((result) => {
       if (!result) return;
-      const initials = (result.manager as string)
-        .split(' ')
-        .map((n: string) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-      this.projectService.updateProject(project.id, { ...result, managerInitials: initials });
+      const managerStr = String(result.managerId || 'PM');
+      const initials = managerStr.slice(0, 2).toUpperCase();
+      this.projectService.updateProject(project.id, { ...result, manager: managerStr, managerInitials: initials, managerId: result.managerId });
       if (this.selectedProject()?.id === project.id) {
         const updated = this.projects().find((p) => p.id === project.id);
         if (updated) this.selectedProject.set(updated);

@@ -30,6 +30,7 @@ export class App {
       { label: 'Budget', icon: 'account_balance_wallet', route: '/budget' },
       { label: 'Documents', icon: 'description', route: '/documents' },
       { label: 'Reports', icon: 'bar_chart', route: '/reports' },
+      { label: 'Users', icon: 'manage_accounts', route: '/users' },
     ],
     bottomNav: [
       { label: 'RBAC', icon: 'admin_panel_settings', route: '/rbac' },

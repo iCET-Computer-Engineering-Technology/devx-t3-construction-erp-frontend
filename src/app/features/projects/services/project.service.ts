@@ -34,7 +34,7 @@ export class ProjectService {
             startDate: sd,
             endDate: ed,
             budgetUsed: '$0',
-            budgetTotal: '$100000',
+            budgetTotal: `$${p.total_budget || 0}`,
             budgetStatus: 'On Track' as const,
             progress: 0,
             estimatedCompletion: ed,
@@ -59,7 +59,8 @@ export class ProjectService {
       start_date: new Date(data.startDate).getTime(),
       estimated_end_date: new Date(data.endDate).getTime(),
       status: data.status,
-      project_manager_id: Number(data.managerId) || 1
+      project_manager_id: Number(data.managerId) || 1,
+      total_budget: parseFloat((data.budgetTotal || '0').replace(/[^0-9.-]+/g,""))
     };
     this.http.post<boolean>(this.apiUrl, payload).subscribe({
       next: (success) => {
@@ -79,6 +80,7 @@ export class ProjectService {
     if (data.endDate) payload.estimated_end_date = new Date(data.endDate).getTime();
     if (data.status) payload.status = data.status;
     if (data.managerId) payload.project_manager_id = Number(data.managerId);
+    if (data.budgetTotal) payload.total_budget = parseFloat(data.budgetTotal.replace(/[^0-9.-]+/g,""));
 
     this.http.patch<boolean>(`${this.apiUrl}/${id}`, payload).subscribe({
       next: (success) => {

@@ -1,19 +1,36 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import type { Project } from '../models/project.model';
+import { UserService } from '../../../core/services/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
   private http = inject(HttpClient);
+  private userService = inject(UserService);
   private apiUrl = 'http://localhost:8080/projects';
 
   private readonly projectsSignal = signal<Project[]>([]);
+  private usersMap = new Map<number, string>();
 
   readonly projects = this.projectsSignal.asReadonly();
   readonly totalCount = computed(() => this.projectsSignal().length);
 
   constructor() {
-    this.refreshProjects();
+    this.loadUsersAndProjects();
+  }
+
+  private loadUsersAndProjects(): void {
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        users.forEach(u => this.usersMap.set(Number(u.userId), u.name));
+        this.refreshProjects();
+      },
+      error: (err) => {
+        console.error('Failed to load users', err);
+        // Fallback to refresh projects anyway
+        this.refreshProjects();
+      }
+    });
   }
 
   refreshProjects(): void {
@@ -22,15 +39,18 @@ export class ProjectService {
         const mapped = (data || []).map(p => {
           const sd = p.start_date ? new Date(p.start_date).toISOString().split('T')[0] : '';
           const ed = p.estimated_end_date ? new Date(p.estimated_end_date).toISOString().split('T')[0] : '';
+          const managerName = this.usersMap.get(Number(p.project_manager_id)) || `Manager ${p.project_manager_id}`;
+          const managerInitials = managerName.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+
           return {
             id: p.project_Id,
             name: p.project_name,
             type: 'Construction',
             location: p.location,
             status: p.status,
-            manager: `Manager ${p.project_manager_id}`,
+            manager: managerName,
             managerId: p.project_manager_id,
-            managerInitials: `M${p.project_manager_id}`,
+            managerInitials: managerInitials,
             startDate: sd,
             endDate: ed,
             budgetUsed: '$0',

@@ -27,7 +27,7 @@ export class ProjectService {
       },
       error: (err) => {
         console.error('Failed to load users', err);
-        // Fallback to refresh projects anyway
+    
         this.refreshProjects();
       }
     });

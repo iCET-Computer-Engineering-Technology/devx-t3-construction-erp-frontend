@@ -88,4 +88,15 @@ export class UserListComponent implements OnInit {
             });
         }
     }
+
+    getRoleClass(role?: string): string {
+        switch (role) {
+            case 'ADMIN':
+                return 'role-admin';
+            case 'PROJECT_MANAGER':
+                return 'role-manager';
+            default:
+                return 'role-user';
+        }
+    }
 }

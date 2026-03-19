@@ -1,5 +1,4 @@
 <div class="dashboard-container">
-
   <header class="dashboard-header">
     <div class="header-left">
       <p class="project-subtitle">ACTIVE PROJECT</p>
@@ -65,7 +64,6 @@
   </section>
 
   <section class="middle-grid">
-
     <div class="dashboard-card col-span-2 p-6">
       <div class="section-header mb-6">
         <h3 class="section-title">Project Timeline Visualization</h3>
@@ -82,7 +80,7 @@
             <span class="timeline-status text-green">Completed</span>
           </div>
           <div class="timeline-bar-bg">
-            <div class="timeline-bar bg-green" style="width: 100%;"></div>
+            <div class="timeline-bar bg-green" style="width: 100%"></div>
           </div>
         </div>
 
@@ -92,9 +90,9 @@
             <span class="timeline-status text-blue">85% In Progress</span>
           </div>
           <div class="timeline-bar-bg flex-offset">
-            <div class="offset-space" style="width: 20%;"></div>
+            <div class="offset-space" style="width: 20%"></div>
             <div class="timeline-active-area border-blue bg-blue-light">
-              <div class="timeline-bar bg-blue" style="width: 85%;"></div>
+              <div class="timeline-bar bg-blue" style="width: 85%"></div>
             </div>
           </div>
         </div>
@@ -105,9 +103,9 @@
             <span class="timeline-status text-orange">30% In Progress</span>
           </div>
           <div class="timeline-bar-bg flex-offset">
-            <div class="offset-space" style="width: 50%;"></div>
+            <div class="offset-space" style="width: 50%"></div>
             <div class="timeline-active-area border-orange bg-orange-light">
-              <div class="timeline-bar bg-orange" style="width: 30%;"></div>
+              <div class="timeline-bar bg-orange" style="width: 30%"></div>
             </div>
           </div>
         </div>
@@ -118,8 +116,8 @@
             <span class="timeline-status text-gray-light">Pending</span>
           </div>
           <div class="timeline-bar-bg flex-offset">
-            <div class="offset-space" style="width: 75%;"></div>
-            <div class="timeline-active-area border-gray bg-gray-light" style="width: 25%;"></div>
+            <div class="offset-space" style="width: 75%"></div>
+            <div class="timeline-active-area border-gray bg-gray-light" style="width: 25%"></div>
           </div>
         </div>
       </div>
@@ -135,26 +133,35 @@
       <div class="chart-mockup">
         <div class="chart-line-dashed"></div>
 
-        <div class="chart-line-wrapper"
-             [style.width.%]="chartWidthPercentage"
-             [style.height.%]="chartHeightPercentage">
+        <div
+          class="chart-line-wrapper"
+          [style.width.%]="chartWidthPercentage"
+          [style.height.%]="chartHeightPercentage"
+        >
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="smooth-svg">
-            <line x1="0" y1="100" x2="100" y2="0" stroke="#ea580c" stroke-width="4" vector-effect="non-scaling-stroke"></line>
+            <line
+              x1="0"
+              y1="100"
+              x2="100"
+              y2="0"
+              stroke="#ea580c"
+              stroke-width="4"
+              vector-effect="non-scaling-stroke"
+            ></line>
           </svg>
         </div>
-
       </div>
 
       <div class="chart-x-axis">
         <span *ngFor="let month of chartMonths">{{ month }}</span>
       </div>
-      <p class="chart-footer-text">Project is currently tracking {{ daysBehind }} days behind original baseline.</p>
+      <p class="chart-footer-text">
+        Project is currently tracking {{ daysBehind }} days behind original baseline.
+      </p>
     </div>
-
   </section>
 
   <section class="bottom-grid">
-
     <div class="dashboard-card col-span-2 p-6">
       <div class="section-header mb-6">
         <h3 class="section-title">Milestone Tracking</h3>
@@ -163,31 +170,37 @@
 
       <table class="data-table">
         <thead>
-        <tr>
-          <th>Milestone Name</th>
-          <th>Planned Date</th>
-          <th>Forecast Date</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
+          <tr>
+            <th>Milestone Name</th>
+            <th>Planned Date</th>
+            <th>Forecast Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let milestone of milestones">
-          <td class="font-medium text-gray-dark">{{ milestone.name }}</td>
-          <td>{{ milestone.plannedDate }}</td>
-          <td>{{ milestone.forecastDate }}</td>
-          <td>
-              <span class="badge"
-                    [ngClass]="{
-                      'badge-green': milestone.status === 'Completed',
-                      'badge-orange': milestone.status === 'Delayed',
-                      'bg-blue-light text-blue': milestone.status === 'On Track'
-                    }">
+          <tr *ngFor="let milestone of milestones">
+            <td class="font-medium text-gray-dark">{{ milestone.name }}</td>
+            <td>{{ milestone.plannedDate }}</td>
+            <td>{{ milestone.forecastDate }}</td>
+            <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'badge-green': milestone.status === 'Completed',
+                  'badge-orange': milestone.status === 'Delayed',
+                  'bg-blue-light text-blue': milestone.status === 'On Track',
+                }"
+              >
                 {{ milestone.status }}
               </span>
-          </td>
-          <td><button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Details</button></td>
-        </tr>
+            </td>
+            <td>
+              <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem">
+                Details
+              </button>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -198,16 +211,18 @@
         <span class="gallery-label text-orange">GALLERY</span>
       </div>
       <div class="gallery-container" (click)="nextImage()" title="Click to swap image">
-        <img [src]="galleryImages[currentImageIndex]" alt="Construction Site Progress" class="site-image">
+        <img
+          [src]="galleryImages[currentImageIndex]"
+          alt="Construction Site Progress"
+          class="site-image"
+        />
         <div class="gallery-overlay">
           <span>Tap to view next photo</span>
         </div>
       </div>
     </div>
-
   </section>
   <section id="task-schedule-section" class="schedule-grid mt-6">
-
     <div class="dashboard-card p-6">
       <div class="section-header mb-6">
         <h3 class="section-title text-green">Completed Tasks</h3>
@@ -220,7 +235,9 @@
               <p class="task-date">{{ task.startDate }} to {{ task.dueDate }}</p>
             </div>
             <div class="task-worker">
-              <span class="worker-badge bg-gray-light text-gray-dark">👤 {{ task.workerName || 'Unassigned' }}</span>
+              <span class="worker-badge bg-gray-light text-gray-dark"
+                >👤 {{ task.workerName || 'Unassigned' }}</span
+              >
             </div>
           </div>
         </ng-container>
@@ -233,26 +250,149 @@
       </div>
       <div class="task-list">
         <ng-container *ngFor="let task of tasks">
-          <div class="task-item"
-               [ngClass]="{'border-l-orange': task.status === 'IN_PROGRESS', 'border-l-gray': task.status === 'TODO'}"
-               *ngIf="task.status !== 'DONE'">
+          <div
+            class="task-item"
+            [ngClass]="{
+              'border-l-orange': task.status === 'IN_PROGRESS',
+              'border-l-gray': task.status === 'TODO',
+            }"
+            *ngIf="task.status !== 'DONE'"
+          >
             <div class="task-info">
               <h4 class="task-title">
                 {{ task.title }}
-                <span class="badge" [ngClass]="{'badge-orange': task.status === 'IN_PROGRESS', 'bg-gray-light text-gray': task.status === 'TODO'}">
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'badge-orange': task.status === 'IN_PROGRESS',
+                    'bg-gray-light text-gray': task.status === 'TODO',
+                  }"
+                >
                   {{ task.status === 'IN_PROGRESS' ? 'In Progress' : 'To Do' }}
                 </span>
               </h4>
               <p class="task-date">{{ task.startDate }} to {{ task.dueDate }}</p>
             </div>
             <div class="task-worker">
-              <span class="worker-badge bg-gray-light text-gray-dark">👤 {{ task.workerName || 'Unassigned' }}</span>
+              <span class="worker-badge bg-gray-light text-gray-dark"
+                >👤 {{ task.workerName || 'Unassigned' }}</span
+              >
             </div>
           </div>
         </ng-container>
       </div>
     </div>
-
   </section>
 
+  <!-- ===== PROJECT TEAM MEMBERS ===== -->
+  <section class="mt-6">
+    <div class="dashboard-card full-width-card p-6">
+      <div class="section-header mb-6">
+        <div class="header-left">
+          <h3 class="section-title text-orange">Project Team Members</h3>
+          <p class="metric-subtext">Manage who has access to this project</p>
+        </div>
+        <button class="btn btn-primary" (click)="openAddMemberModal()">+ Add Member</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Member Name</th>
+              <th>Role</th>
+              <th>Project Label</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of projectMembers">
+              <td class="font-medium">
+                <div class="flex items-center gap-2">
+                  <span>👤</span>
+                  {{ member.name }}
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-gray">{{ member.role }}</span>
+              </td>
+              <td>{{ member.projectRoleLabel }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button
+                    class="action-btn edit-btn"
+                    title="Edit Role"
+                    (click)="onEditRole(member)"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    class="action-btn delete-btn"
+                    title="Remove Member"
+                    (click)="onDeleteMember(member.userId)"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="projectMembers.length === 0">
+              <td colspan="4" class="text-center p-4 text-gray">
+                No members found in this project.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ADD MEMBER MODAL ===== -->
+  <div class="modal-overlay" *ngIf="showAddMemberModal" (click)="closeAddMemberModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h3 class="section-title mb-4">Add Member</h3>
+      <div class="form-group mb-4">
+        <label>Select User</label>
+        <select [(ngModel)]="selectedUserId" class="form-control">
+          <option value="" disabled>-- Select User --</option>
+          <option *ngFor="let user of allUsers" [value]="user.userId">
+            {{ user.name }} ({{ user.role }})
+          </option>
+        </select>
+      </div>
+      <div class="form-group mb-4">
+        <label>Project Role Label</label>
+        <input
+          type="text"
+          [(ngModel)]="selectedRoleLabel"
+          class="form-control"
+          placeholder="e.g. Site Engineer"
+        />
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn-primary" (click)="onAddMember()">Add</button>
+        <button class="btn btn-secondary" (click)="closeAddMemberModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EDIT MEMBER MODAL ===== -->
+  <div class="modal-overlay" *ngIf="showEditMemberModal" (click)="closeEditMemberModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h3 class="section-title mb-4">Edit Role — {{ editingMember?.name }}</h3>
+      <div class="form-group mb-4">
+        <label>Project Role Label</label>
+        <input
+          type="text"
+          [(ngModel)]="editRoleLabel"
+          class="form-control"
+          placeholder="e.g. Site Engineer"
+        />
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn-primary" (click)="onUpdateRole()">Update</button>
+        <button class="btn btn-secondary" (click)="closeEditMemberModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>

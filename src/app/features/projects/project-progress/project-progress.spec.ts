@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectProgress } from './project-progress';
+import { ProjectProgressComponent } from './project-progress';
 
 describe('ProjectProgress', () => {
-  let component: ProjectProgress;
-  let fixture: ComponentFixture<ProjectProgress>;
+  let component: ProjectProgressComponent;
+  let fixture: ComponentFixture<ProjectProgressComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjectProgress]
+      imports: [ProjectProgressComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ProjectProgress);
+    fixture = TestBed.createComponent(ProjectProgressComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

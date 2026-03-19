@@ -1,0 +1,110 @@
+<div class="task-form-page">
+  <div class="form-header">
+    <div>
+      <h1>{{ pageTitle }}</h1>
+      <p>Capture project execution details and assign ownership.</p>
+    </div>
+    <a class="btn-secondary" routerLink="/tasks">Back to Board</a>
+  </div>
+
+  <form class="task-form" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <div class="grid two-col">
+      <label class="field">
+        <span>Task Title *</span>
+        <input type="text" formControlName="title" placeholder="Concrete Foundation Pouring" />
+        @if (hasError('title')) {
+          <small>Task title is required (minimum 3 characters).</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Project *</span>
+        <select formControlName="projectId">
+          <option value="">Select project</option>
+          @for (project of projects(); track project.id) {
+            <option [value]="project.id">{{ project.name }}</option>
+          }
+        </select>
+        @if (hasError('projectId')) {
+          <small>Project is required.</small>
+        }
+      </label>
+    </div>
+
+    <label class="field full-width">
+      <span>Description</span>
+      <textarea formControlName="description" rows="4" placeholder="Describe scope, constraints, and expected output"></textarea>
+    </label>
+
+    <div class="grid two-col">
+      <label class="field">
+        <span>Assign User *</span>
+        <select formControlName="assigneeUserId">
+          <option value="">Select worker</option>
+          @for (user of workerUsers(); track user.userId) {
+            <option [value]="user.userId" [disabled]="isAssigneeLockedForSelectedProject(user.userId)">
+              {{ user.name }}
+            </option>
+          }
+        </select>
+        @if (hasError('assigneeUserId')) {
+          <small>Assigned worker is required.</small>
+        }
+        @if (taskForm.controls.assigneeUserId.value && isAssigneeLockedForSelectedProject(taskForm.controls.assigneeUserId.value)) {
+          <small>This user is already assigned to a different project.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Priority *</span>
+        <select formControlName="priority">
+          <option value="LOW">Low</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HIGH">High</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="grid three-col">
+      <label class="field">
+        <span>Start Date *</span>
+        <input type="date" formControlName="startDate" />
+        @if (hasError('startDate')) {
+          <small>Start date is required.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Due Date *</span>
+        <input type="date" formControlName="endDate" />
+        @if (hasError('endDate')) {
+          <small>Due date is required.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Status *</span>
+        <select formControlName="status">
+          <option value="TODO">To Do</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="DONE">Completed</option>
+        </select>
+      </label>
+    </div>
+
+    @if (submitError()) {
+      <p class="form-error">{{ submitError() }}</p>
+    }
+
+    <div class="form-actions">
+      <a class="btn-secondary" routerLink="/tasks">Cancel</a>
+      <button type="submit" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          {{ submitLoadingLabel }}
+        } @else {
+          {{ submitLabel }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

@@ -22,5 +22,15 @@ export const routes: Routes = [
         loadComponent: () => import('./features/user-management/user-list/user-list.component').then(c => c.UserListComponent),
         canActivate: [authGuard]
     },
+    {
+        path: 'tasks',
+        loadComponent: () => import('./features/task/task.component').then(c => c.TasksComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'tasks/new',
+        loadComponent: () => import('./features/task/new-task-form').then(c => c.NewTaskFormComponent),
+        canActivate: [authGuard]
+    },
     { path: '**', redirectTo: '/dashboard' }
 ];

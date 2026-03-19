@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import type { Project } from '../models/project.model';
 import { UserService } from '../../../core/services/user.service';
+import { map, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
@@ -122,4 +123,32 @@ export class ProjectService {
       error: (err) => console.error('Failed to delete project', err)
     });
   }
+
+
+getProjectMembers(projectId: number): Observable<any[]> {
+  return this.http.get<any>(`${this.apiUrl}/${projectId}/members`).pipe(
+    map(res => res.data || [])
+  );
+}
+
+addMember(projectId: number, userId: number, projectRoleLabel: string, currentUserId: number) {
+  return this.http.post(`${this.apiUrl}/${projectId}/member`, 
+    { userId, projectRoleLabel },
+    { headers: { 'User-Id': currentUserId.toString() } }
+  );
+}
+
+removeMember(projectId: number, userId: number, currentUserId: number) {
+  return this.http.delete(`${this.apiUrl}/${projectId}/members/${userId}`, 
+    { headers: { 'User-Id': currentUserId.toString() } }
+  );
+}
+
+updateMemberRole(projectId: number, userId: number, newRoleLabel: string, currentUserId: number) {
+  return this.http.patch(
+    `${this.apiUrl}/${projectId}/members/${userId}/role`,
+    { projectRoleLable: newRoleLabel },
+    { headers: { 'User-Id': currentUserId.toString() } }
+  );
+}
 }

@@ -1,4 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -17,6 +18,7 @@ import { ProjectProgressComponent } from './project-progress/project-progress';
 export class ProjectsComponent {
   private projectService = inject(ProjectService);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   readonly projects = this.projectService.projects;
   readonly selectedProject = signal<Project | null>(null);
@@ -61,7 +63,7 @@ export class ProjectsComponent {
   });
 
   selectProject(project: Project): void {
-    this.selectedProject.set(project);
+    this.router.navigate(['/projects', project.id]);
   }
 
   setTab(tab: 'active' | 'details' | 'resources'): void {

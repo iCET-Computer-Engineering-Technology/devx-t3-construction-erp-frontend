@@ -4,19 +4,19 @@
       <p class="project-subtitle">ACTIVE PROJECT</p>
       <div class="project-title-wrapper">
         <h1 class="project-title">{{ projectName || 'Skyview Tower Phase II' }}</h1>
-        <span class="dropdown-icon">⌄</span>
+        <span class="dropdown-icon"><mat-icon>keyboard_arrow_down</mat-icon></span>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn btn-outline" (click)="scrollToSchedule()">📅 Schedule View</button>
-      <button class="btn btn-outline">📤 Export</button>
+      <button class="btn btn-outline" (click)="scrollToSchedule()" style="display: flex; align-items: center; gap: 4px;"><mat-icon style="font-size: 18px; width: 18px; height: 18px;">calendar_today</mat-icon> Schedule View</button>
+      <button class="btn btn-outline" style="display: flex; align-items: center; gap: 4px;"><mat-icon style="font-size: 18px; width: 18px; height: 18px;">ios_share</mat-icon> Export</button>
     </div>
   </header>
 
   <section class="metrics-grid">
     <div class="dashboard-card metric-card">
       <div class="card-header">
-        <div class="icon-wrapper bg-blue-light text-blue">↻</div>
+        <div class="icon-wrapper bg-blue-light text-blue" style="display: flex; align-items: center; justify-content: center;"><mat-icon style="font-size: 20px; width: 20px; height: 20px;">refresh</mat-icon></div>
         <span class="badge badge-green">+2.4%</span>
       </div>
       <div class="card-body">
@@ -30,7 +30,7 @@
 
     <div class="dashboard-card metric-card">
       <div class="card-header">
-        <div class="icon-wrapper bg-orange-light text-orange">⏱</div>
+        <div class="icon-wrapper bg-orange-light text-orange" style="display: flex; align-items: center; justify-content: center;"><mat-icon style="font-size: 20px; width: 20px; height: 20px;">timer</mat-icon></div>
         <span class="badge badge-orange">Watch</span>
       </div>
       <div class="card-body">
@@ -42,7 +42,7 @@
 
     <div class="dashboard-card metric-card">
       <div class="card-header">
-        <div class="icon-wrapper bg-purple-light text-purple">⚑</div>
+        <div class="icon-wrapper bg-purple-light text-purple" style="display: flex; align-items: center; justify-content: center;"><mat-icon style="font-size: 20px; width: 20px; height: 20px;">flag</mat-icon></div>
       </div>
       <div class="card-body">
         <p class="metric-label">Upcoming Milestones</p>
@@ -53,7 +53,7 @@
 
     <div class="dashboard-card metric-card">
       <div class="card-header">
-        <div class="icon-wrapper bg-red-light text-red">!</div>
+        <div class="icon-wrapper bg-red-light text-red" style="display: flex; align-items: center; justify-content: center;"><mat-icon style="font-size: 20px; width: 20px; height: 20px;">priority_high</mat-icon></div>
       </div>
       <div class="card-body">
         <p class="metric-label">Critical Path Tasks</p>
@@ -235,8 +235,8 @@
               <p class="task-date">{{ task.startDate }} to {{ task.dueDate }}</p>
             </div>
             <div class="task-worker">
-              <span class="worker-badge bg-gray-light text-gray-dark"
-                >👤 {{ task.workerName || 'Unassigned' }}</span
+              <span class="worker-badge bg-gray-light text-gray-dark" style="display: flex; align-items: center; gap: 4px;"
+                ><mat-icon style="font-size: 14px; width: 14px; height: 14px;">person</mat-icon> {{ task.workerName || 'Unassigned' }}</span
               >
             </div>
           </div>
@@ -274,8 +274,8 @@
               <p class="task-date">{{ task.startDate }} to {{ task.dueDate }}</p>
             </div>
             <div class="task-worker">
-              <span class="worker-badge bg-gray-light text-gray-dark"
-                >👤 {{ task.workerName || 'Unassigned' }}</span
+              <span class="worker-badge bg-gray-light text-gray-dark" style="display: flex; align-items: center; gap: 4px;"
+                ><mat-icon style="font-size: 14px; width: 14px; height: 14px;">person</mat-icon> {{ task.workerName || 'Unassigned' }}</span
               >
             </div>
           </div>
@@ -309,7 +309,7 @@
             <tr *ngFor="let member of projectMembers">
               <td class="font-medium">
                 <div class="flex items-center gap-2">
-                  <span>👤</span>
+                  <mat-icon style="font-size: 18px; width: 18px; height: 18px;">person</mat-icon>
                   {{ member.name }}
                 </div>
               </td>
@@ -323,15 +323,17 @@
                     class="action-btn edit-btn"
                     title="Edit Role"
                     (click)="onEditRole(member)"
+                    style="display: flex; align-items: center; justify-content: center;"
                   >
-                    ✏️
+                    <mat-icon style="font-size: 18px; width: 18px; height: 18px;">edit</mat-icon>
                   </button>
                   <button
                     class="action-btn delete-btn"
                     title="Remove Member"
                     (click)="onDeleteMember(member.userId)"
+                    style="display: flex; align-items: center; justify-content: center;"
                   >
-                    🗑️
+                    <mat-icon style="font-size: 18px; width: 18px; height: 18px;">delete_outline</mat-icon>
                   </button>
                 </div>
               </td>

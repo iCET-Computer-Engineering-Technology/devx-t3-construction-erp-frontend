@@ -21,6 +21,7 @@ export class App {
     brandSubtitle: 'ENTERPRISE ERP',
     mainNav: [
       { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
+      { label: 'My Tasks', icon: 'assignment_turned_in', route: '/my-tasks' },
       { label: 'Projects', icon: 'folder_open', route: '/projects' },
       { label: 'Tasks', icon: 'task_alt', route: '/tasks' },
       { label: 'WBS', icon: 'account_tree', route: '/wbs' },

@@ -77,6 +77,18 @@ export class TaskService {
     );
   }
 
+  getMyTasks(userId: number): Observable<Task[]> {
+    return this.http.get<TaskApiResponse[]>(`${this.apiUrl}/my`, {
+      headers: { 'User-Id': userId.toString() }
+    }).pipe(
+      map(items => (items ?? []).map(task => this.mapFromApi(task))),
+      catchError(error => {
+        console.error('Failed to load my tasks', error);
+        return of([]);
+      })
+    );
+  }
+
   private mapToApi(payload: CreateTaskPayload) {
     return {
       taskId: undefined, // Usually null for creation

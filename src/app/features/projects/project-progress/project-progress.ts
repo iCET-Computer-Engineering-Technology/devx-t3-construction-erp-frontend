@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../../core/services/user.service';
@@ -39,7 +40,7 @@ interface ProjectMember {
   templateUrl: './project-progress.html',
   styleUrls: ['./project-progress.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, MatIconModule]
 })
 export class ProjectProgressComponent implements OnInit {
 

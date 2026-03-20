@@ -1,0 +1,111 @@
+<div class="my-tasks-page">
+  <div class="header">
+    <div class="header-left">
+      <h1>My Assigned Tasks</h1>
+      <p>Manage your daily construction site duties and project milestones.</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary"><mat-icon>add</mat-icon> New Log Entry</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-content">
+        <p class="stat-title">TODAY'S TASKS</p>
+        <h2>{{ todaysTasksCount() }}</h2>
+        <p class="stat-trend trend-up">+2% vs yesterday</p>
+      </div>
+      <div class="stat-icon bg-orange-light text-orange">
+        <mat-icon>calendar_today</mat-icon>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content">
+        <p class="stat-title">UPCOMING DEADLINES</p>
+        <h2>{{ upcomingDeadlinesCount() }}</h2>
+        <p class="stat-trend trend-down">Urgent action</p>
+      </div>
+      <div class="stat-icon bg-red-light text-red">
+        <mat-icon>notifications</mat-icon>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content">
+        <p class="stat-title">COMPLETED THIS WEEK</p>
+        <h2>{{ completedThisWeekCount() }}</h2>
+        <p class="stat-trend trend-up">+5% vs last week</p>
+      </div>
+      <div class="stat-icon bg-green-light text-green">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab() === 'ALL'" (click)="setTab('ALL')">All Tasks</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'TODO'" (click)="setTab('TODO')">To Do</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'IN_PROGRESS'" (click)="setTab('IN_PROGRESS')">In Progress</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'DONE'" (click)="setTab('DONE')">Completed</button>
+  </div>
+
+  <div class="task-list">
+    @for (task of filteredTasks(); track task.taskId) {
+      <div class="task-item-card" [class.completed]="task.status === 'DONE'">
+        <div class="task-item-header">
+          <div class="task-badges">
+            <span class="status-badge" 
+                  [class.status-todo]="task.status === 'TODO'"
+                  [class.status-inprogress]="task.status === 'IN_PROGRESS'"
+                  [class.status-done]="task.status === 'DONE'">
+              {{ task.status === 'IN_PROGRESS' ? 'IN PROGRESS' : (task.status === 'DONE' ? 'DONE' : 'TO DO') }}
+            </span>
+            <span class="project-tag">#PRJ-{{ task.projectId }}</span>
+          </div>
+          <div class="task-actions">
+            @if(task.status !== 'DONE') {
+              <button class="btn btn-outline" [class.btn-outline-orange]="task.status === 'TODO'" [class.btn-dark]="task.status === 'IN_PROGRESS'">
+                {{ task.status === 'TODO' ? 'Start Task' : 'Update Status' }}
+              </button>
+            } @else {
+              <button class="btn btn-disabled">Archived</button>
+              <button class="btn btn-icon" style="border-radius: 6px;"><mat-icon style="font-size: 18px; width: 18px; height: 18px">visibility</mat-icon></button>
+            }
+            <button class="btn btn-icon" style="border-radius: 6px;"><mat-icon style="font-size: 18px; width: 18px; height: 18px">more_vert</mat-icon></button>
+          </div>
+        </div>
+        
+        <h3 class="task-title" [class.title-strikethrough]="task.status === 'DONE'">{{ task.title }}</h3>
+        <p class="task-desc">{{ task.description || 'No description provided.' }}</p>
+        
+        <div class="task-item-footer">
+          <div class="footer-item" [class.text-green]="task.status === 'DONE'">
+            <mat-icon class="icon-sm">{{ task.status === 'DONE' ? 'check_circle' : 'calendar_today' }}</mat-icon>
+            <span>
+              {{ task.status === 'DONE' ? 'Completed: ' : (task.startDate ? '' : 'Not started') }}
+              {{ task.status === 'DONE' ? 'Yesterday' : (task.startDate ? formatDate(task.startDate) : '') }}
+            </span>
+          </div>
+          @if(task.status !== 'DONE') {
+            <div class="footer-item" [class.text-orange]="isToday(task.endDate) || task.status === 'IN_PROGRESS'">
+              <mat-icon class="icon-sm">schedule</mat-icon>
+              <span class="font-medium">
+                {{ isToday(task.endDate) ? 'Today' : formatDate(task.endDate) }}
+              </span>
+            </div>
+          }
+          <div class="footer-item">
+            <mat-icon class="icon-sm">layers</mat-icon>
+            <span>Phase {{ task.projectId || 'Unknown' }}</span>
+          </div>
+        </div>
+      </div>
+    }
+    
+    @if (filteredTasks().length === 0) {
+      <div class="empty-state">
+        <p>No tasks found in this category.</p>
+      </div>
+    }
+  </div>
+</div>

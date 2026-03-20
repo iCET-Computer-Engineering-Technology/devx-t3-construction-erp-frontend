@@ -21,6 +21,6 @@ export const routes: Routes = [
         path: 'users',
         loadComponent: () => import('./features/user-management/user-list/user-list.component').then(c => c.UserListComponent),
         canActivate: [authGuard]
-    },
+    }, 
     { path: '**', redirectTo: '/dashboard' }
 ];

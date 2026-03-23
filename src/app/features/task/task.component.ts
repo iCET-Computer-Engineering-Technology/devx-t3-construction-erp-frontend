@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { Router } from "@angular/router";
 import { TaskService } from './service/task.service';
 import { ProjectService } from '../projects/services/project.service';
+import { MatDialog } from '@angular/material/dialog';
+import { TaskDetailComponent } from './task-detail-component/task-detail-component';
 import type { Task, TaskPriority, TaskStatus } from './model/task.model';
 
 @Component({
@@ -14,6 +16,7 @@ export class TasksComponent {
     private readonly router = inject(Router);
     private readonly taskService = inject(TaskService);
     private readonly projectService = inject(ProjectService);
+    private readonly dialog = inject(MatDialog);
 
     readonly tasks = this.taskService.tasks;
     readonly projects = this.projectService.projects;
@@ -34,6 +37,13 @@ export class TasksComponent {
 
     onNewTaskClick() {
         this.router.navigate(["/tasks/new"]);
+    }
+
+    openTaskDetail(task: Task) {
+        this.dialog.open(TaskDetailComponent, {
+            width: '600px',
+            data: { task }
+        });
     }
 
     onProjectFilterChange(event: Event) {

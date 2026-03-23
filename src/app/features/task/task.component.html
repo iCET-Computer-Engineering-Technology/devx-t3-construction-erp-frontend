@@ -30,7 +30,7 @@
                 </div>
 
                 @for (task of todoTasks(); track task.taskId) {
-                    <div class="task-card">
+                    <div class="task-card" (click)="openTaskDetail(task)" style="cursor: pointer;">
                         <span
                             class="priority"
                             [class.high]="task.priority === 'HIGH'"
@@ -62,7 +62,7 @@
                 </div>
 
                 @for (task of inProgressTasks(); track task.taskId) {
-                    <div class="task-card">
+                    <div class="task-card" (click)="openTaskDetail(task)" style="cursor: pointer;">
                         <span
                             class="priority"
                             [class.high]="task.priority === 'HIGH'"
@@ -94,7 +94,7 @@
                 </div>
 
                 @for (task of doneTasks(); track task.taskId) {
-                    <div class="task-card">
+                    <div class="task-card" (click)="openTaskDetail(task)" style="cursor: pointer;">
                         <span
                             class="priority"
                             [class.high]="task.priority === 'HIGH'"

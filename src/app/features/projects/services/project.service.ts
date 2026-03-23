@@ -28,7 +28,7 @@ export class ProjectService {
       },
       error: (err) => {
         console.error('Failed to load users', err);
-    
+
         this.refreshProjects();
       }
     });
@@ -132,17 +132,24 @@ getProjectMembers(projectId: number): Observable<any[]> {
 }
 
 addMember(projectId: number, userId: number, projectRoleLabel: string, currentUserId: number) {
-  return this.http.post(`${this.apiUrl}/${projectId}/member`, 
+  return this.http.post(`${this.apiUrl}/${projectId}/member`,
     { userId, projectRoleLabel },
     { headers: { 'User-Id': currentUserId.toString() } }
   );
 }
 
 removeMember(projectId: number, userId: number, currentUserId: number) {
-  return this.http.delete(`${this.apiUrl}/${projectId}/members/${userId}`, 
+  return this.http.delete(`${this.apiUrl}/${projectId}/members/${userId}`,
     { headers: { 'User-Id': currentUserId.toString() } }
   );
 }
+getProjectBudget(projectId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${projectId}/budget`);
+  }
+
+  saveProjectBudget(projectId: number, totalBudget: number, method: 'post' | 'patch'): Observable<any> {
+    return this.http[method](`${this.apiUrl}/${projectId}/budget`, { totalBudget });
+  }
 
 updateMemberRole(projectId: number, userId: number, newRoleLabel: string, currentUserId: number) {
   return this.http.patch(

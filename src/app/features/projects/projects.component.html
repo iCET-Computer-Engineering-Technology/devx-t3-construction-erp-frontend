@@ -1,5 +1,4 @@
 <div class="projects-page">
-  <!-- Page Header -->
   <div class="page-header">
     <div class="header-text">
       <h1 class="page-title">Project Management</h1>
@@ -11,7 +10,6 @@
     </button>
   </div>
 
-  <!-- Filters -->
   <div class="filters-bar">
     <div class="filter-group">
       <label class="filter-label">STATUS</label>
@@ -29,7 +27,7 @@
       <select class="filter-select" [value]="managerFilter()" (change)="onManagerFilter($event)">
         <option value="all">All Managers</option>
         @for (m of managers(); track m) {
-          <option [value]="m">{{ m }}</option>
+        <option [value]="m">{{ m }}</option>
         }
       </select>
     </div>
@@ -46,7 +44,6 @@
     </button>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs-bar">
     <button
       class="tab"
@@ -65,87 +62,85 @@
     >Resource Allocation</button>
   </div>
 
-  <!-- Table Card -->
   <div class="table-card">
     <table class="project-table">
       <thead>
-        <tr>
-          <th class="th-name">PROJECT NAME</th>
-          <th>STATUS</th>
-          <th>MANAGER</th>
-          <th>TIMELINE</th>
-          <th>BUDGET STATUS</th>
-          <th>PROGRESS</th>
-          <th class="th-actions"></th>
-        </tr>
+      <tr>
+        <th class="th-name">PROJECT NAME</th>
+        <th>STATUS</th>
+        <th>MANAGER</th>
+        <th>TIMELINE</th>
+        <th>BUDGET STATUS</th>
+        <th>PROGRESS</th>
+        <th class="th-actions"></th>
+      </tr>
       </thead>
       <tbody>
-        @for (project of pagedProjects(); track project.id) {
-          <tr
-            class="project-row"
-            [class.selected]="selectedProject()?.id === project.id"
-            (click)="selectProject(project)"
-          >
-            <td class="td-name">
-              <div class="project-name">{{ project.name }}</div>
-              <div class="project-meta">{{ project.type }} · {{ project.location }}</div>
-            </td>
-            <td>
+      @for (project of pagedProjects(); track project.id) {
+      <tr
+        class="project-row"
+        [class.selected]="selectedProject()?.id === project.id"
+        (click)="selectProject(project)"
+      >
+        <td class="td-name">
+          <div class="project-name">{{ project.name }}</div>
+          <div class="project-meta">{{ project.type }} · {{ project.location }}</div>
+        </td>
+        <td>
               <span class="status-badge" [class]="getStatusClass(project.status)">
                 {{ formatStatus(project.status) }}
               </span>
-            </td>
-            <td>
-              <div class="manager-cell">
-                <span class="manager-avatar">{{ project.managerInitials }}</span>
-                <span class="manager-name">{{ project.manager }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="timeline-cell">
-                <span class="timeline-start">{{ project.startDate }}</span>
-                <span class="timeline-end">End: {{ project.endDate }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="budget-cell">
+        </td>
+        <td>
+          <div class="manager-cell">
+            <span class="manager-avatar">{{ project.managerInitials }}</span>
+            <span class="manager-name">{{ project.manager }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="timeline-cell">
+            <span class="timeline-start">{{ project.startDate }}</span>
+            <span class="timeline-end">End: {{ project.endDate }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="budget-cell">
                 <span class="budget-label" [class]="getBudgetClass(project.budgetStatus)">
                   {{ project.budgetStatus }}
                 </span>
-                <span class="budget-amount">{{ project.budgetUsed }} / {{ project.budgetTotal }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="progress-cell">
-                <div class="progress-bar-track">
-                  <div
-                    class="progress-bar-fill"
-                    [style.width.%]="project.progress"
-                    [style.backgroundColor]="getProgressColor(project.progress)"
-                  ></div>
-                </div>
-                <span class="progress-text">{{ project.progress }}%</span>
-              </div>
-            </td>
-            <td class="td-actions">
-              <button class="row-action-btn" matRipple (click)="openEditDialog(project, $event)" title="Edit">
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button class="row-action-btn delete" matRipple (click)="deleteProject(project, $event)" title="Delete">
-                <mat-icon>delete_outline</mat-icon>
-              </button>
-            </td>
-          </tr>
-        }
-        @if (pagedProjects().length === 0) {
-          <tr>
-            <td colspan="7" class="empty-state">No projects found.</td>
-          </tr>
-        }
+            <span class="budget-amount">{{ project.budgetUsed }} / {{ project.budgetTotal }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="progress-cell">
+            <div class="progress-bar-track">
+              <div
+                class="progress-bar-fill"
+                [style.width.%]="project.progress"
+                [style.backgroundColor]="getProgressColor(project.progress)"
+              ></div>
+            </div>
+            <span class="progress-text">{{ project.progress }}%</span>
+          </div>
+        </td>
+        <td class="td-actions">
+          <button class="row-action-btn" matRipple (click)="openEditDialog(project, $event)" title="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button class="row-action-btn delete" matRipple (click)="deleteProject(project, $event)" title="Delete">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </td>
+      </tr>
+      }
+      @if (pagedProjects().length === 0) {
+      <tr>
+        <td colspan="7" class="empty-state">No projects found.</td>
+      </tr>
+      }
       </tbody>
     </table>
 
-    <!-- Pagination -->
     <div class="table-footer">
       <span class="showing-text">
         Showing {{ pagedProjects().length }} of {{ filteredProjects().length }} projects
@@ -156,89 +151,4 @@
       </div>
     </div>
   </div>
-
-  <!-- Selected Project Details + Map -->
-  @if (selectedProject(); as sp) {
-    <div class="details-row">
-      <!-- Project Details -->
-      <div class="details-card">
-        <div class="details-header">
-          <h3 class="details-title">Selected Project Details</h3>
-          <button class="full-report-btn" matRipple>
-            Full Report
-            <mat-icon class="fr-icon">open_in_new</mat-icon>
-          </button>
-        </div>
-
-        <div class="detail-stats">
-          <div class="detail-stat">
-            <span class="stat-label">EST. COMPLETION</span>
-            <span class="stat-value">{{ sp.estimatedCompletion }}</span>
-          </div>
-          <div class="detail-stat">
-            <span class="stat-label">MAN-HOURS</span>
-            <span class="stat-value">{{ sp.manHours }}</span>
-          </div>
-          <div class="detail-stat">
-            <span class="stat-label">RISK LEVEL</span>
-            <span class="stat-value risk-badge" [class]="'risk-' + sp.riskLevel.toLowerCase()">
-              {{ sp.riskLevel }}
-            </span>
-          </div>
-          <div class="detail-stat">
-            <span class="stat-label">TOTAL SUBCONTRACTORS</span>
-            <span class="stat-value">{{ sp.totalSubcontractors }} Companies</span>
-          </div>
-        </div>
-
-        <!-- Milestones -->
-        <h4 class="milestones-title">Milestone Progress</h4>
-        <div class="milestones-list">
-          @for (m of sp.milestones; track m.name) {
-            <div class="milestone-item">
-              <div class="milestone-icon" [class]="'ms-' + m.status">
-                @if (m.status === 'completed') {
-                  <mat-icon>check_circle</mat-icon>
-                } @else if (m.status === 'in-progress') {
-                  <mat-icon>radio_button_checked</mat-icon>
-                } @else {
-                  <mat-icon>radio_button_unchecked</mat-icon>
-                }
-              </div>
-              <div class="milestone-content">
-                <span class="milestone-name">{{ m.name }}</span>
-                @if (m.status === 'in-progress' && m.progress) {
-                  <div class="milestone-bar-track">
-                    <div class="milestone-bar-fill" [style.width.%]="m.progress"></div>
-                  </div>
-                }
-              </div>
-              <span class="milestone-detail" [class]="'md-' + m.status">{{ m.detail }}</span>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Project Map -->
-      <div class="map-card">
-        <h3 class="details-title">Project Map</h3>
-        <div class="map-placeholder">
-          <div class="map-image">
-            <mat-icon class="map-pin-icon">location_on</mat-icon>
-            <div class="map-coords">
-              <span>{{ sp.coordinates.lat }}, {{ sp.coordinates.lng }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="map-address">
-          <div class="address-text">
-            @for (line of sp.address.split('\n'); track line) {
-              <span>{{ line }}</span>
-            }
-          </div>
-          <mat-icon class="address-icon">near_me</mat-icon>
-        </div>
-      </div>
-    </div>
-  }
 </div>

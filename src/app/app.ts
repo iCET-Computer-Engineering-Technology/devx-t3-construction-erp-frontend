@@ -26,6 +26,29 @@ export class App {
   //   brandSubtitle: 'ENTERPRISE ERP',
   //   mainNav: [
   //     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
+  //     { label: 'My Tasks', icon: 'assignment_turned_in', route: '/my-tasks' },
+  //     { label: 'Projects', icon: 'folder_open', route: '/projects' },
+  //     { label: 'Tasks', icon: 'task_alt', route: '/tasks' },
+  //     { label: 'WBS', icon: 'account_tree', route: '/wbs' },
+  //     { label: 'Progress', icon: 'trending_up', route: '/progress' },
+  //     { label: 'Equipment', icon: 'construction', route: '/equipment' },
+  //     { label: 'Workforce', icon: 'groups', route: '/workforce' },
+  //     { label: 'Budget', icon: 'account_balance_wallet', route: '/budget' },
+  //     { label: 'Documents', icon: 'description', route: '/documents' },
+  //     { label: 'Reports', icon: 'bar_chart', route: '/reports' },
+  //     { label: 'Users', icon: 'manage_accounts', route: '/users' },
+  //   ],
+  //   bottomNav: [
+  //     { label: 'RBAC', icon: 'admin_panel_settings', route: '/rbac' },
+  //     { label: 'Settings', icon: 'settings', route: '/settings' },
+  //   ],
+  // };
+
+  // protected readonly sidebarConfig: SidebarConfig = {
+  //   brandName: 'BuildFlow',
+  //   brandSubtitle: 'ENTERPRISE ERP',
+  //   mainNav: [
+  //     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
   //     { label: 'Projects', icon: 'folder_open', route: '/projects' },
   //     { label: 'Tasks', icon: 'task_alt', route: '/tasks' },
   //     { label: 'WBS', icon: 'account_tree', route: '/wbs' },

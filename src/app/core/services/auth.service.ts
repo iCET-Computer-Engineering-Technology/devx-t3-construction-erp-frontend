@@ -15,7 +15,7 @@ export interface CurrentUserInfo {
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = '/api/auth';
+    private apiUrl = 'http://localhost:8080/api/auth';
     private tokenKey = 'jwt_token';
     private roleKey = 'user_role';
     private nameKey = 'user_name';

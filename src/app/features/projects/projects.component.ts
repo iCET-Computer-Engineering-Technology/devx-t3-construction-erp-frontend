@@ -6,12 +6,11 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ProjectService } from './services/project.service';
 import { ProjectFormDialogComponent } from './project-form-dialog.component';
 import type { Project } from './models/project.model';
-import { ProjectProgressComponent } from './project-progress/project-progress';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [MatIconModule, MatRippleModule, MatDialogModule,ProjectProgressComponent],
+  imports: [MatIconModule, MatRippleModule, MatDialogModule],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.css',
 })

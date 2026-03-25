@@ -68,17 +68,17 @@ export class App {
 
   private readonly ALL_MAIN_NAV = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT', 'WORKER'] },
-    { label: 'My Tasks', icon: 'assignments', route: '/my-tasks',   roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
+    { label: 'My Tasks', icon: 'assignments', route: '/my-tasks', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
     { label: 'Projects', icon: 'folder_open', route: '/projects', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
-    { label: 'Tasks', icon: 'task_alt', route: '/tasks',          roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
-    { label: 'WBS', icon: 'account_tree', route: '/wbs',          roles: ['ADMIN', 'PROJECT_MANAGER'] },
-    { label: 'Progress', icon: 'timeline', route: '/progress',   roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
+    { label: 'Tasks', icon: 'task_alt', route: '/tasks', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
+    { label: 'WBS', icon: 'account_tree', route: '/wbs', roles: ['ADMIN', 'PROJECT_MANAGER'] },
+    { label: 'Progress', icon: 'timeline', route: '/progress', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
     { label: 'Equipment', icon: 'construction', route: '/equipmemt', roles: ['ADMIN', 'SITE_ENGINEER'] },
-    { label: 'Workforce', icon: 'groups', route: '/workforce',  roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
-    { label: 'Budget', icon: 'account_balance_wallet', route: '/budget',          roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
-    { label: 'Documents', icon: 'description', route: '/documents',  roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
-    { label: 'Reports', icon: 'assessment', route: '/reports',        roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
-    { label: 'Users', icon: 'manage_accounts', route: '/users',              roles: ['ADMIN', ] }, 
+    { label: 'Workforce', icon: 'groups', route: '/workforce', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
+    { label: 'Budget', icon: 'account_balance_wallet', route: '/budget', roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
+    { label: 'Documents', icon: 'description', route: '/documents', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
+    { label: 'Reports', icon: 'assessment', route: '/reports', roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
+    { label: 'Users', icon: 'manage_accounts', route: '/users', roles: ['ADMIN',] },
 
 
     // { label: 'Projects', icon: 'folder_open', route: '/projects', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
@@ -105,7 +105,7 @@ export class App {
 
   protected readonly sidebarConfig = computed<SidebarConfig>(() => {
     const role = this.currentUserRole()?.toString() || '';
-    
+
     return {
       brandName: 'BuildFlow',
       brandSubtitle: 'ENTERPRISE ERP',

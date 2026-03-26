@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
+import { CommonModule } from '@angular/common';
+import { ClientViewService } from '../../core/services/client-view.service';
+
 
 interface KpiCard {
   title: string;
@@ -35,11 +38,28 @@ interface Activity {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatIconModule, MatRippleModule],
+  imports: [MatIconModule, MatRippleModule, CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {
+
+export class DashboardComponent implements OnInit{
+
+  ngOnInit(): void {
+    const projectId = 10; 
+    const token = '29132d30-33b0-4381-bc96-b4c4e9e12bb6';
+
+    this.clientService.getProjectDetails(projectId, token).subscribe({
+      next: (res) => {
+        this.projectDetails = res.data; 
+        console.log('Success:', this.projectDetails);
+      },
+
+      error: (err) => {
+        console.error('Error:', err);
+      }
+    });
+  }
   readonly activeChartTab: 'monthly' | 'quarterly' = 'monthly';
 
   readonly kpiCards: KpiCard[] = [
@@ -123,4 +143,9 @@ export class DashboardComponent {
   getBarHeight(value: number): number {
     return Math.round((value / 100) * 140);
   }
+
+  projectDetails: any;
+  constructor(private clientService: ClientViewService) {}
+
+  
 }

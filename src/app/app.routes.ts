@@ -18,9 +18,33 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
+        path: 'projects/:id',
+        loadComponent: () => import('./features/projects/project-details/project-details.component').then(c => c.ProjectDetailsComponent),
+        canActivate: [authGuard]
+    },
+    {
         path: 'users',
         loadComponent: () => import('./features/user-management/user-list/user-list.component').then(c => c.UserListComponent),
         canActivate: [authGuard]
+    },
+    {
+        path: 'my-tasks',
+        loadComponent: () => import('./features/task/my-tasks/my-tasks.component').then(c => c.MyTasksComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'tasks',
+        loadComponent: () => import('./features/task/task.component').then(c => c.TasksComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'tasks/new',
+        loadComponent: () => import('./features/task/new-task-form').then(c => c.NewTaskFormComponent),
+        canActivate: [authGuard]
+    },
+    {    
+        path: 'client-view',
+        loadComponent: () => import('./features/client-view/client-view.component').then(c => c.ClientViewComponent)
     },
     { path: '**', redirectTo: '/dashboard' }
 ];

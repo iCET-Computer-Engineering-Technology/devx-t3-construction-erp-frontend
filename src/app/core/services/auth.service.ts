@@ -9,10 +9,9 @@ import { Router } from '@angular/router';
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = '/api/auth';
+    private apiUrl = 'http://localhost:8080/api/auth';
     private tokenKey = 'jwt_token';
     private roleKey = 'user_role';
-
     private currentUserRoleSubject = new BehaviorSubject<UserRole | null>(
         (localStorage.getItem(this.roleKey) as UserRole) || this.getRoleFromToken(this.getToken())
     );

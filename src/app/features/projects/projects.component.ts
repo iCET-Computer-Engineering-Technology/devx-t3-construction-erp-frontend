@@ -11,7 +11,7 @@ import { ProjectProgressComponent } from './project-progress/project-progress';
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [MatIconModule, MatRippleModule, MatDialogModule,ProjectProgressComponent],
+  imports: [MatIconModule, MatRippleModule, MatDialogModule],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.css',
 })

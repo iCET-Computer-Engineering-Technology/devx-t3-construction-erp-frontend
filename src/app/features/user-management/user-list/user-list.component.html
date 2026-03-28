@@ -1,0 +1,72 @@
+<div class="projects-page user-management-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1 class="page-title">User Management</h1>
+      <p class="page-subtitle">Configure system access permissions and team roles securely.</p>
+    </div>
+    <button class="btn-new-project" matRipple (click)="openUserForm()">
+      <mat-icon class="btn-icon">add</mat-icon>
+      Add User
+    </button>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <table class="project-table">
+      <thead>
+        <tr>
+          <th class="th-name">NAME & EMAIL</th>
+          <th>ROLE</th>
+          <th>STATUS</th>
+          <th class="th-actions">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users; track user.userId) {
+          <tr class="project-row">
+            <td class="td-name">
+              <div class="manager-cell">
+                <span class="manager-avatar">{{ user.name.substring(0,2).toUpperCase() }}</span>
+                <div class="address-text">
+                  <span>{{ user.name }}</span>
+                  <span>{{ user.email }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="role-badge" [class]="getRoleClass(user.role)">
+                {{ user.role || 'USER' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [class]="user.status === 'ACTIVE' ? 'status-completed' : 'status-cancelled'">
+                {{ user.status }}
+              </span>
+            </td>
+            <td class="td-actions">
+              <button class="row-action-btn" matRipple [title]="user.status === 'ACTIVE' ? 'Deactivate' : 'Activate'" (click)="toggleStatus(user)">
+                <mat-icon [style.color]="user.status === 'ACTIVE' ? '#dc2626' : '#16a34a'">
+                  {{ user.status === 'ACTIVE' ? 'block' : 'check_circle' }}
+                </mat-icon>
+              </button>
+              <button class="row-action-btn" matRipple title="Edit" (click)="openUserForm(user)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="row-action-btn delete" matRipple title="Delete" (click)="deleteUser(user.userId)">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </td>
+          </tr>
+        }
+        @if (users.length === 0) {
+          <tr>
+            <td colspan="4" class="empty-state">
+              {{ isLoading ? 'Loading users...' : 'No users found in the system.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

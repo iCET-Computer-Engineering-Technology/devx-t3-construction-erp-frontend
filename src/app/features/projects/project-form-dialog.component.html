@@ -1,0 +1,76 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">{{ title }}</h2>
+    <button class="close-btn" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="dialog-form">
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label class="form-label">Project Name *</label>
+        <input class="form-input" formControlName="name" placeholder="e.g. Skyline Plaza Phase II" />
+        @if (form.get('name')?.touched && form.get('name')?.hasError('required')) {
+          <span class="form-error">Project name is required</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Location *</label>
+        <input class="form-input" formControlName="location" placeholder="e.g. Austin, TX" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status *</label>
+        <select class="form-input" formControlName="status">
+          <option value="ACTIVE">In Progress</option>
+          <option value="ON_HOLD">On Hold</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="PLANNING">Planning</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Project Manager *</label>
+        <select class="form-input" formControlName="managerId">
+          <option value="" disabled>Select Manager</option>
+          @for (manager of managers; track manager.userId) {
+            <option [value]="manager.userId">{{ manager.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Total Budget *</label>
+        <input class="form-input" formControlName="budgetTotal" placeholder="e.g. $4.5M" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Date *</label>
+        <input type="date" class="form-input" formControlName="startDate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date *</label>
+        <input type="date" class="form-input" formControlName="endDate" />
+      </div>
+    </div>
+
+    <div class="form-group full-width">
+      <label class="form-label">Address *</label>
+      <textarea class="form-input textarea" formControlName="address" rows="2" placeholder="e.g. 1422 Congress Ave.&#10;Austin, TX 78701"></textarea>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary">
+        {{ isEdit ? 'Update Project' : 'Create Project' }}
+      </button>
+    </div>
+  </form>
+</div>

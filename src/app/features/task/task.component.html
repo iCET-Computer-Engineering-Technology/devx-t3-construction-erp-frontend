@@ -1,0 +1,137 @@
+<div class="tasks-page">
+    <div class="board-header">
+        <div class="header-text">
+            <h1 class="page-title">Project Tasks</h1>
+            <p class="page-subtitle">Track execution progress and assign responsibilities across active projects.</p>
+        </div>
+        <div class="header-actions">
+            <select class="project-filter" (change)="onProjectFilterChange($event)">
+                <option value="">All Projects</option>
+                @for (project of projects(); track project.id) {
+                    <option [value]="project.id">{{ project.name }}</option>
+                }
+            </select>
+            <button class="new-task-btn" (click)="onNewTaskClick()">+ New Task</button>
+        </div>
+    </div>
+
+    @if (tasks().length === 0) {
+        <div class="empty-panel">
+            <h3>No tasks yet</h3>
+            <p>Create your first task to start tracking field operations and deadlines.</p>
+            <button class="new-task-btn" (click)="onNewTaskClick()">Create First Task</button>
+        </div>
+    } @else {
+        @for (pt of projectsWithTasks(); track pt.project.id) {
+            <div class="project-swimlane" style="margin-bottom: 40px;">
+                <h2 style="margin-bottom: 16px; font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 12px;">
+                    <mat-icon style="color: #64748b;">business</mat-icon>
+                    {{ pt.project.name }}
+                    <span style="font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; background: #e2e8f0; color: #475569; font-weight: 500;">{{ pt.project.status }}</span>
+                </h2>
+                
+                <div class="task-board">
+                    <div class="column" id="to-do">
+                        <div class="column-header">
+                            <span>{{ formatStatus('TODO') }}</span>
+                            <span class="count">{{ pt.todoTasks.length }}</span>
+                        </div>
+
+                        @for (task of pt.todoTasks; track task.taskId) {
+                            <div class="task-card">
+                                <span
+                                    class="priority"
+                                    [class.high]="task.priority === 'HIGH'"
+                                    [class.medium]="task.priority === 'MEDIUM'"
+                                    [class.low]="task.priority === 'LOW'"
+                                >
+                                    {{ formatPriority(task.priority) }}
+                                </span>
+                                <h4>{{ task.title }}</h4>
+                                <div class="task-footer">
+                                    <span>{{ formatDate(task.endDate) }}</span>
+                                    <div class="footer-right">
+                                        <span class="assignee">{{ task.assigneeUserName }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (pt.todoTasks.length === 0) {
+                            <p class="column-empty">No tasks in this column.</p>
+                        }
+                    </div>
+
+                    <div class="column" id="in-progress">
+                        <div class="column-header">
+                            <span>{{ formatStatus('IN_PROGRESS') }}</span>
+                            <span class="count">{{ pt.inProgressTasks.length }}</span>
+                        </div>
+
+                        @for (task of pt.inProgressTasks; track task.taskId) {
+                            <div class="task-card">
+                                <span
+                                    class="priority"
+                                    [class.high]="task.priority === 'HIGH'"
+                                    [class.medium]="task.priority === 'MEDIUM'"
+                                    [class.low]="task.priority === 'LOW'"
+                                >
+                                    {{ formatPriority(task.priority) }}
+                                </span>
+                                <h4>{{ task.title }}</h4>
+                                <div class="task-footer">
+                                    <span>{{ formatDate(task.endDate) }}</span>
+                                    <div class="footer-right">
+                                        <span class="assignee">{{ task.assigneeUserName }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (pt.inProgressTasks.length === 0) {
+                            <p class="column-empty">No tasks in this column.</p>
+                        }
+                    </div>
+
+                    <div class="column" id="done">
+                        <div class="column-header">
+                            <span>{{ formatStatus('DONE') }}</span>
+                            <span class="count">{{ pt.doneTasks.length }}</span>
+                        </div>
+
+                        @for (task of pt.doneTasks; track task.taskId) {
+                            <div class="task-card">
+                                <span
+                                    class="priority"
+                                    [class.high]="task.priority === 'HIGH'"
+                                    [class.medium]="task.priority === 'MEDIUM'"
+                                    [class.low]="task.priority === 'LOW'"
+                                >
+                                    {{ formatPriority(task.priority) }}
+                                </span>
+                                <h4>{{ task.title }}</h4>
+                                <div class="task-footer">
+                                    <span>{{ formatDate(task.endDate) }}</span>
+                                    <div class="footer-right">
+                                        <span class="assignee">{{ task.assigneeUserName }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (pt.doneTasks.length === 0) {
+                            <p class="column-empty">No tasks in this column.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        
+        @if (projectsWithTasks().length === 0) {
+            <div class="empty-panel">
+                <h3>No tasks match the selected project</h3>
+                <p>Try clearing the project filter to see tasks across all projects.</p>
+            </div>
+        }
+    }
+</div>

@@ -15,7 +15,7 @@ import type { User } from '../../core/models/user.model';
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [MatIconModule, MatRippleModule, MatDialogModule, FormsModule],
+  imports: [MatIconModule, MatRippleModule, MatDialogModule],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.css',
 })

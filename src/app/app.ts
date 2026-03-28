@@ -28,6 +28,7 @@ export class App {
       { label: 'Progress', icon: 'trending_up', route: '/progress' },
       { label: 'Equipment', icon: 'construction', route: '/equipment' },
       { label: 'Workforce', icon: 'groups', route: '/workforce' },
+      { label: 'Procurement', icon: 'shopping_cart', route: '/procurement' },
       { label: 'Budget', icon: 'account_balance_wallet', route: '/budget' },
       { label: 'Documents', icon: 'description', route: '/documents' },
       { label: 'Reports', icon: 'bar_chart', route: '/reports' },

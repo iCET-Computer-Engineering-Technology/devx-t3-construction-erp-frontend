@@ -2,18 +2,29 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import type { Project } from '../models/project.model';
 import { UserService } from '../../../core/services/user.service';
+import { TaskService } from '../../task/service/task.service';
 import { map, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
   private http = inject(HttpClient);
   private userService = inject(UserService);
+  private taskService = inject(TaskService);
   private apiUrl = 'http://localhost:8080/projects';
 
   private readonly projectsSignal = signal<Project[]>([]);
   private usersMap = new Map<number, string>();
 
-  readonly projects = this.projectsSignal.asReadonly();
+  readonly projects = computed(() => {
+    const tasks = this.taskService.tasks();
+    return this.projectsSignal().map(p => {
+      const projectTasks = tasks.filter(t => String(t.projectId) === String(p.id));
+      const doneTasks = projectTasks.filter(t => t.status === 'DONE').length;
+      const progress = projectTasks.length > 0 ? Math.round((doneTasks / projectTasks.length) * 100) : 0;
+      return { ...p, progress };
+    });
+  });
+
   readonly totalCount = computed(() => this.projectsSignal().length);
 
   constructor() {

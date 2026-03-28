@@ -1,0 +1,67 @@
+<div class="task-detail-dialog-container">
+  <div mat-dialog-title class="dialog-header">
+    <div class="header-content">
+      <h2 class="task-title">{{ data.task.title }}</h2>
+      <button mat-icon-button (click)="close()" class="close-btn" aria-label="Close dialog">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="task-meta">
+      <mat-chip-set>
+        <mat-chip [ngClass]="['status-chip', data.task.status.toLowerCase()]">{{ data.task.status }}</mat-chip>
+        <mat-chip [ngClass]="['priority-chip', data.task.priority.toLowerCase()]">{{ data.task.priority }} Priority</mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    <div class="detail-section">
+      <div class="info-group">
+        <mat-icon class="info-icon">business</mat-icon>
+        <div class="info-text">
+          <span class="label">Project</span>
+          <span class="value">{{ projectName }}</span>
+        </div>
+      </div>
+      
+      <div class="info-group">
+        <mat-icon class="info-icon">person</mat-icon>
+        <div class="info-text">
+          <span class="label">Assignee</span>
+          <span class="value">ID: {{ data.task.assigneeUserId }}</span>
+          <span style="font-size: 14px; color: #64748b; margin-top: 2px;">{{ assigneeName || 'Loading...' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider class="divider"></mat-divider>
+
+    <div class="description-section">
+      <h3>Description</h3>
+      <p class="description-text">{{ data.task.description || 'No description provided.' }}</p>
+    </div>
+
+    <mat-divider class="divider"></mat-divider>
+
+    <div class="timeline-section">
+      <div class="date-group">
+        <mat-icon>event</mat-icon>
+        <div class="date-info">
+          <span class="label">Start Date</span>
+          <span class="date-val">{{ data.task.startDate | date:'mediumDate' }}</span>
+        </div>
+      </div>
+      <div class="date-group">
+        <mat-icon>event_available</mat-icon>
+        <div class="date-info">
+          <span class="label">Due Date</span>
+          <span class="date-val">{{ data.task.endDate | date:'mediumDate' }}</span>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Close</button>
+  </mat-dialog-actions>
+</div>

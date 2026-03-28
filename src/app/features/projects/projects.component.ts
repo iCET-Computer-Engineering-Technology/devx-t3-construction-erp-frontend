@@ -1,12 +1,16 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, combineLatest, startWith } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ProjectService } from './services/project.service';
 import { ProjectFormDialogComponent } from './project-form-dialog.component';
+import { UserService } from '../../core/services/user.service';
 import type { Project } from './models/project.model';
-import { ProjectProgressComponent } from './project-progress/project-progress';
+import type { User } from '../../core/models/user.model';
 
 @Component({
   selector: 'app-projects',
@@ -15,72 +19,121 @@ import { ProjectProgressComponent } from './project-progress/project-progress';
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.css',
 })
-export class ProjectsComponent {
+export class ProjectsComponent implements OnInit, OnDestroy {
   private projectService = inject(ProjectService);
+  private userService = inject(UserService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private destroy$ = new Subject<void>();
 
-  readonly projects = this.projectService.projects;
-  readonly selectedProject = signal<Project | null>(null);
-  readonly activeTab = signal<'active' | 'details' | 'resources'>('active');
-
-  // Filters
+  // ── Search & filter signals ──────────────────────────────────────────────
+  readonly searchKeyword = signal<string>('');
   readonly statusFilter = signal<string>('all');
-  readonly managerFilter = signal<string>('all');
+  readonly managerFilter = signal<number>(0);   // 0 = all
 
-  // Pagination
+  // ── UI state ─────────────────────────────────────────────────────────────
+  readonly isLoading = signal<boolean>(false);
+  readonly activeTab = signal<'active' | 'details' | 'resources'>('active');
+  readonly selectedProject = signal<Project | null>(null);
+
+  // ── Results ───────────────────────────────────────────────────────────────
+  /** All results returned by the current search call */
+  readonly searchResults = signal<Project[]>([]);
+
+  /** Project managers loaded for the filter dropdown */
+  readonly projectManagers = signal<User[]>([]);
+
+  // ── Pagination ────────────────────────────────────────────────────────────
   readonly pageSize = 3;
   readonly currentPage = signal(1);
 
-  readonly filteredProjects = computed(() => {
-    let list = this.projects();
-    const status = this.statusFilter();
-    const manager = this.managerFilter();
-    if (status !== 'all') list = list.filter((p) => p.status === status);
-    if (manager !== 'all') list = list.filter((p) => p.manager === manager);
-    return list;
-  });
-
   readonly pagedProjects = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize;
-    return this.filteredProjects().slice(start, start + this.pageSize);
+    return this.searchResults().slice(start, start + this.pageSize);
   });
 
   readonly totalPages = computed(() =>
-    Math.ceil(this.filteredProjects().length / this.pageSize)
+    Math.ceil(this.searchResults().length / this.pageSize)
   );
 
-  readonly managers = computed(() => {
-    const names = new Set(this.projects().map((p) => p.manager));
-    return Array.from(names);
-  });
+  // ── Subjects for reactive search ──────────────────────────────────────────
+  private keywordSubject$ = new Subject<string>();
+  private statusSubject$ = new Subject<string>();
+  private managerSubject$ = new Subject<number>();
 
-  readonly showingRange = computed(() => {
-    const total = this.filteredProjects().length;
-    const start = (this.currentPage() - 1) * this.pageSize + 1;
-    const end = Math.min(this.currentPage() * this.pageSize, total);
-    return `${start}-${end}`;
-  });
+  // Keep all projects as fallback reference (for full-data mapping)
+  readonly projects = this.projectService.projects;
 
-  selectProject(project: Project): void {
-    this.router.navigate(['/projects', project.id]);
+  ngOnInit(): void {
+    // Load project managers list for the dropdown
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        const managers = users.filter(u =>
+          (u.role as string) === 'PROJECT_MANAGER'
+        );
+        this.projectManagers.set(managers);
+      },
+      error: (err) => console.error('Failed to load users for filter', err)
+    });
+
+    // Reactive pipeline: any filter change triggers a debounced backend call
+    combineLatest([
+      this.keywordSubject$.pipe(startWith(''), debounceTime(400), distinctUntilChanged()),
+      this.statusSubject$.pipe(startWith('all'), distinctUntilChanged()),
+      this.managerSubject$.pipe(startWith(0), distinctUntilChanged()),
+    ])
+      .pipe(
+        switchMap(([keyword, status, managerId]) => {
+          this.isLoading.set(true);
+          return this.projectService.searchProjects({ keyword, status, projectManagerId: managerId > 0 ? managerId : undefined });
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (results) => {
+          this.searchResults.set(results);
+          this.currentPage.set(1);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Search failed', err);
+          this.isLoading.set(false);
+        }
+      });
   }
 
-  setTab(tab: 'active' | 'details' | 'resources'): void {
-    this.activeTab.set(tab);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  // ── Filter handlers ───────────────────────────────────────────────────────
+
+  onSearchInput(value: string): void {
+    this.searchKeyword.set(value);
+    this.keywordSubject$.next(value);
   }
 
   onStatusFilter(event: Event): void {
-    this.statusFilter.set((event.target as HTMLSelectElement).value);
-    this.currentPage.set(1);
+    const value = (event.target as HTMLSelectElement).value;
+    this.statusFilter.set(value);
+    this.statusSubject$.next(value);
     this.selectedProject.set(null);
   }
 
   onManagerFilter(event: Event): void {
-    this.managerFilter.set((event.target as HTMLSelectElement).value);
-    this.currentPage.set(1);
+    const value = Number((event.target as HTMLSelectElement).value);
+    this.managerFilter.set(value);
+    this.managerSubject$.next(value);
     this.selectedProject.set(null);
   }
+
+  clearSearch(): void {
+    this.searchKeyword.set('');
+    this.keywordSubject$.next('');
+  }
+
+  // ── Pagination ────────────────────────────────────────────────────────────
 
   prevPage(): void {
     this.currentPage.update((p) => Math.max(1, p - 1));
@@ -88,6 +141,16 @@ export class ProjectsComponent {
 
   nextPage(): void {
     this.currentPage.update((p) => Math.min(this.totalPages(), p + 1));
+  }
+
+  // ── Navigation & dialogs ──────────────────────────────────────────────────
+
+  setTab(tab: 'active' | 'details' | 'resources'): void {
+    this.activeTab.set(tab);
+  }
+
+  selectProject(project: Project): void {
+    this.router.navigate(['/projects', project.id]);
   }
 
   openNewProjectDialog(): void {
@@ -114,6 +177,8 @@ export class ProjectsComponent {
         milestones: [],
         coordinates: { lat: '30.2672° N', lng: '97.7431° W' },
       } as Omit<Project, 'id'>);
+      // Refresh search after add
+      setTimeout(() => this.keywordSubject$.next(this.searchKeyword()), 500);
     });
   }
 
@@ -127,11 +192,10 @@ export class ProjectsComponent {
       if (!result) return;
       const managerStr = String(result.managerId || 'PM');
       const initials = managerStr.slice(0, 2).toUpperCase();
-      this.projectService.updateProject(project.id, { ...result, manager: managerStr, managerInitials: initials, managerId: result.managerId });
-      if (this.selectedProject()?.id === project.id) {
-        const updated = this.projects().find((p) => p.id === project.id);
-        if (updated) this.selectedProject.set(updated);
-      }
+      this.projectService.updateProject(project.id, {
+        ...result, manager: managerStr, managerInitials: initials, managerId: result.managerId
+      });
+      setTimeout(() => this.keywordSubject$.next(this.searchKeyword()), 500);
     });
   }
 
@@ -141,7 +205,10 @@ export class ProjectsComponent {
     if (this.selectedProject()?.id === project.id) {
       this.selectedProject.set(null);
     }
+    setTimeout(() => this.keywordSubject$.next(this.searchKeyword()), 500);
   }
+
+  // ── Display helpers ───────────────────────────────────────────────────────
 
   formatStatus(status: string): string {
     switch (status) {

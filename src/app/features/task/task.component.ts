@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from "@angular/router";
 import { TaskService } from './service/task.service';
 import { ProjectService } from '../projects/services/project.service';
@@ -8,6 +10,8 @@ import type { Task, TaskPriority, TaskStatus } from './model/task.model';
 
 @Component({
     selector: "app-tasks",
+    standalone: true,
+    imports: [CommonModule, MatIconModule],
     templateUrl: "./task.component.html",
     styleUrls: ["./task.component.css"],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -23,17 +27,25 @@ export class TasksComponent {
     
     readonly selectedProjectId = signal<number | null>(null);
 
-    readonly filteredTasks = computed(() => {
-        const projectId = this.selectedProjectId();
-        if (projectId) {
-            return this.tasks().filter(task => task.projectId === projectId);
+    readonly projectsWithTasks = computed(() => {
+        const selectedId = this.selectedProjectId();
+        let displayProjects = this.projects();
+        
+        if (selectedId) {
+            displayProjects = displayProjects.filter(p => p.id === selectedId);
         }
-        return this.tasks();
-    });
 
-    readonly todoTasks = computed(() => this.tasksByStatus('TODO'));
-    readonly inProgressTasks = computed(() => this.tasksByStatus('IN_PROGRESS'));
-    readonly doneTasks = computed(() => this.tasksByStatus('DONE'));
+        return displayProjects.map(project => {
+            const pTasks = this.tasks().filter(t => t.projectId === project.id);
+            return {
+                project,
+                todoTasks: pTasks.filter(t => t.status === 'TODO'),
+                inProgressTasks: pTasks.filter(t => t.status === 'IN_PROGRESS'),
+                doneTasks: pTasks.filter(t => t.status === 'DONE'),
+                totalTasks: pTasks.length
+            };
+        }).filter(p => p.totalTasks > 0 || selectedId); // Show if has tasks OR if explicitly selected
+    });
 
     onNewTaskClick() {
         this.router.navigate(["/tasks/new"]);
@@ -83,7 +95,4 @@ export class TasksComponent {
         });
     }
 
-    private tasksByStatus(status: TaskStatus): Task[] {
-        return this.filteredTasks().filter((task) => task.status === status);
-    }
 }

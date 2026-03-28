@@ -1,48 +1,65 @@
-<div class="dashboard">
+<div class="dashboard" *ngIf="projectDetails">
+  
+  <div class="dashboard-header" style="padding: 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+    <h1 style="font-size: 24px; font-weight: bold; color: #1e293b;">
+      {{ projectDetails?.projectName }} Dashboard
+    </h1>
+    <p style="color: #64748b;">Status: <span style="font-weight: 600; color: #10b981;">{{ projectDetails?.status }}</span></p>
+    
+    <div style="margin-top: 10px;">
+      <p style="font-size: 14px; color: #475569;">Progress: <b>{{ projectDetails?.progress }}%</b></p>
+      <p style="font-size: 14px; color: #475569;">Tasks: {{ projectDetails?.completedTasks }} / {{ projectDetails?.totalTasks }} Completed</p>
+    </div>
+  </div>
   <!-- KPI Cards Row -->
   <section class="kpi-row">
-    @for (card of kpiCards; track card.title) {
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <div class="kpi-icon-wrapper">
-            <mat-icon class="kpi-icon">{{ card.icon }}</mat-icon>
-          </div>
-          @if (card.trend) {
-            <span
-              class="kpi-trend"
-              [class.up]="card.trend.direction === 'up'"
-              [class.down]="card.trend.direction === 'down'"
-              [class.stable]="card.trend.direction === 'stable'"
-            >
-              @if (card.trend.direction === 'up') {
-                <mat-icon class="trend-icon">arrow_drop_up</mat-icon>
-              } @else if (card.trend.direction === 'down') {
-                <mat-icon class="trend-icon">arrow_drop_down</mat-icon>
-              }
-              {{ card.trend.value }}
-            </span>
-          }
-          @if (card.badge) {
-            <span class="kpi-badge">{{ card.badge.text }}</span>
-          }
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon-wrapper">
+          <mat-icon class="kpi-icon">architecture</mat-icon>
         </div>
-        <div class="kpi-title">{{ card.title }}</div>
-        <div class="kpi-value">{{ card.value }}</div>
-        @if (card.title === 'BUDGET USAGE') {
-          <div class="kpi-sub-row">
-            <span class="kpi-value-suffix">/ $1.5M</span>
-          </div>
-        }
-        @if (card.subtitle) {
-          <div class="kpi-subtitle">{{ card.subtitle }}</div>
-        }
-        @if (card.title === 'WORKFORCE AVAIL.') {
-          <div class="kpi-progress-bar">
-            <div class="kpi-progress-fill" style="width: 88%; background-color: #ea580c;"></div>
-          </div>
-        }
+        <span class="kpi-trend up"><mat-icon class="trend-icon">arrow_drop_up</mat-icon> Live</span>
       </div>
-    }
+      <div class="kpi-title">TOTAL PROJECTS</div>
+      <div class="kpi-value">{{ totalProjects() }}</div>
+      <div class="kpi-subtitle">{{ activeProjects() }} Active, {{ totalProjects() - activeProjects() }} Other</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon-wrapper">
+          <mat-icon class="kpi-icon">assignment_late</mat-icon>
+        </div>
+      </div>
+      <div class="kpi-title">ACTIVE TASKS</div>
+      <div class="kpi-value">{{ activeTasks() }}</div>
+      <div class="kpi-subtitle">{{ overdueTasks() }} critical overdue</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon-wrapper">
+          <mat-icon class="kpi-icon">account_balance_wallet</mat-icon>
+        </div>
+        <span class="kpi-trend down"><mat-icon class="trend-icon">arrow_drop_down</mat-icon> -0.8%</span>
+      </div>
+      <div class="kpi-title">BUDGET USAGE</div>
+      <div class="kpi-value">$1.2M</div>
+      <div class="kpi-sub-row"><span class="kpi-value-suffix">/ $1.5M</span></div>
+      <div class="kpi-subtitle">76% of Q3 Allocation</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <div class="kpi-icon-wrapper">
+          <mat-icon class="kpi-icon">inventory_2</mat-icon>
+        </div>
+        <span class="kpi-badge">PENDING MRs</span>
+      </div>
+      <div class="kpi-title">PROCUREMENT WAITING</div>
+      <div class="kpi-value">{{ procurementStats().reqs }}</div>
+      <div class="kpi-subtitle">{{ procurementStats().pos }} Active Purchase Orders</div>
+    </div>
   </section>
 
   <!-- Middle Row: Budget Chart + Upcoming Deadlines -->
@@ -83,7 +100,7 @@
     <div class="deadlines-card">
       <h3 class="card-title">Upcoming Deadlines</h3>
       <div class="deadlines-list">
-        @for (d of deadlines; track d.title) {
+        @for (d of deadlines(); track d.title) {
           <div class="deadline-item">
             <div class="deadline-date" [class.urgent]="d.urgent">
               <span class="deadline-month">{{ d.month }}</span>
@@ -104,15 +121,15 @@
   <section class="bottom-row">
     <!-- Task Completion Trend -->
     <div class="chart-card task-chart">
-      <h3 class="card-title">Task Completion Trend</h3>
+      <h3 class="card-title">Task Daily Forecast</h3>
       <div class="chart-body">
         <div class="bar-chart task-bar-chart">
-          @for (day of taskDays; track day; let i = $index) {
+          @for (day of taskDays(); track day; let i = $index) {
             <div class="bar-group">
               <div class="bars">
                 <div
                   class="bar task-bar"
-                  [style.height.px]="getBarHeight(taskValues[i])"
+                  [style.height.px]="getBarHeight(taskValues()[i])"
                 ></div>
               </div>
               <span class="bar-label">{{ day }}</span>
@@ -122,11 +139,11 @@
       </div>
     </div>
 
-    <!-- Site Progress -->
+    <!-- Live Site Progress -->
     <div class="chart-card site-progress-card">
-      <h3 class="card-title">Site Progress</h3>
+      <h3 class="card-title">Live Site Progress</h3>
       <div class="site-progress-list">
-        @for (site of siteProgress; track site.name) {
+        @for (site of siteProgress(); track site.name) {
           <div class="site-item">
             <div class="site-header">
               <span class="site-name">{{ site.name }}</span>
@@ -141,14 +158,17 @@
             </div>
           </div>
         }
+        @if (siteProgress().length === 0) {
+          <div class="empty-state">No Active Projects Available</div>
+        }
       </div>
     </div>
 
-    <!-- Recent Activity -->
+    <!-- Live Recent Activity -->
     <div class="chart-card activity-card">
-      <h3 class="card-title">Recent Activity</h3>
+      <h3 class="card-title">Live Recent Activity</h3>
       <div class="activity-list">
-        @for (a of recentActivity; track a.time) {
+        @for (a of recentActivity(); track a.time + a.action) {
           <div class="activity-item">
             <div class="activity-dot" [class]="'dot-' + a.type">
               @if (a.type === 'success') {
@@ -166,6 +186,9 @@
               <span class="activity-time">{{ a.time }}</span>
             </div>
           </div>
+        }
+        @if (recentActivity().length === 0) {
+          <div class="empty-state">No System Activity Recorded Today</div>
         }
       </div>
     </div>

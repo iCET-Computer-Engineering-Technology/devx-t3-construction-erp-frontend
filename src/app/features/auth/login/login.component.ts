@@ -23,7 +23,7 @@ export class LoginComponent {
     showPassword = signal(false);
 
     private fb = inject(FormBuilder);
-    private authService = inject(AuthService);
+    readonly authService = inject(AuthService);
     private router = inject(Router);
 
     constructor() {
@@ -46,17 +46,18 @@ export class LoginComponent {
             this.authService.login({ email, password }).subscribe({
                 next: () => {
                     this.isLoading = false;
-                    if (this.authService.isAdmin()) {
+                    const role = this.authService.getCurrentRole();
+                    if (role) {
                         this.router.navigate(['/dashboard']);
                     } else {
-                        this.errorMessage = 'Access Denied: Admin role required';
+                        this.errorMessage = 'Access Denied: No valid role assigned to this account.';
                         this.authService.logout();
                     }
                 },
-                error: () => {
+                error: (err) => {
                     this.isLoading = false;
+                    console.error('Login failed. HTTP Status:', err?.status, '| Error body:', err?.error);
                     this.errorMessage = 'Invalid Credentials';
-                    
                 }
             });
         } else {

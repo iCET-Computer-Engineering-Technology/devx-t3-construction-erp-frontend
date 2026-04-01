@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { TaskService } from '../service/task.service';
 import { Task } from '../model/task.model';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { TaskDetailComponent } from '../task-detail-component/task-detail-component';
 
 @Component({
   selector: 'app-my-tasks',
@@ -13,6 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class MyTasksComponent implements OnInit {
   private readonly taskService = inject(TaskService);
+  private readonly dialog = inject(MatDialog);
   
   // Hardcoded for MVP, user 1 based on other parts of app
   private readonly currentUserId = 1;
@@ -42,6 +45,13 @@ export class MyTasksComponent implements OnInit {
 
   setTab(tab: 'ALL' | 'TODO' | 'IN_PROGRESS' | 'DONE') {
     this.activeTab.set(tab);
+  }
+
+  openTaskDetail(task: Task) {
+    this.dialog.open(TaskDetailComponent, {
+      width: '600px',
+      data: { task }
+    });
   }
 
   formatDate(dateStr: string): string {

@@ -10,10 +10,34 @@
     </button>
   </div>
 
+  <!-- ===== Filters Bar ===== -->
   <div class="filters-bar">
+
+    <!-- Keyword Search -->
+    <div class="filter-group search-group">
+      <label class="filter-label">SEARCH</label>
+      <div class="search-wrapper">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          id="project-search-input"
+          type="text"
+          class="filter-input search-input"
+          placeholder="Search by project name…"
+          [value]="searchKeyword()"
+          (input)="onSearchInput($any($event.target).value)"
+        />
+        @if (searchKeyword()) {
+          <button class="clear-btn" (click)="clearSearch()" title="Clear search">
+            <mat-icon class="clear-icon">close</mat-icon>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Status Filter -->
     <div class="filter-group">
       <label class="filter-label">STATUS</label>
-      <select class="filter-select" [value]="statusFilter()" (change)="onStatusFilter($event)">
+      <select id="project-status-filter" class="filter-select" [value]="statusFilter()" (change)="onStatusFilter($event)">
         <option value="all">All Statuses</option>
         <option value="ACTIVE">In Progress</option>
         <option value="ON_HOLD">On Hold</option>
@@ -22,46 +46,34 @@
         <option value="CANCELLED">Cancelled</option>
       </select>
     </div>
+
+    <!-- Project Manager Filter -->
     <div class="filter-group">
       <label class="filter-label">PROJECT MANAGER</label>
-      <select class="filter-select" [value]="managerFilter()" (change)="onManagerFilter($event)">
-        <option value="all">All Managers</option>
-        @for (m of managers(); track m) {
-        <option [value]="m">{{ m }}</option>
+      <select id="project-manager-filter" class="filter-select" [value]="managerFilter()" (change)="onManagerFilter($event)">
+        <option value="0">All Managers</option>
+        @for (mgr of projectManagers(); track mgr.userId) {
+          <option [value]="mgr.userId">{{ mgr.name }}</option>
         }
       </select>
     </div>
-    <div class="filter-group">
-      <label class="filter-label">DATE RANGE</label>
-      <div class="date-input-wrapper">
-        <mat-icon class="date-icon">calendar_today</mat-icon>
-        <input type="text" class="filter-input" placeholder="Select dates" readonly />
-      </div>
+
+    <!-- Result count badge -->
+    <div class="results-badge" [class.hidden]="isLoading()">
+      <span class="results-count">{{ searchResults().length }}</span>
+      <span class="results-label">result{{ searchResults().length !== 1 ? 's' : '' }}</span>
     </div>
-    <button class="more-filters-btn" matRipple>
-      <mat-icon class="mf-icon">tune</mat-icon>
-      More Filters
-    </button>
+
   </div>
 
+  <!-- ===== Tabs ===== -->
   <div class="tabs-bar">
-    <button
-      class="tab"
-      [class.active]="activeTab() === 'active'"
-      (click)="setTab('active')"
-    >Active Projects</button>
-    <button
-      class="tab"
-      [class.active]="activeTab() === 'details'"
-      (click)="setTab('details')"
-    >Project Details</button>
-    <button
-      class="tab"
-      [class.active]="activeTab() === 'resources'"
-      (click)="setTab('resources')"
-    >Resource Allocation</button>
+    <button class="tab" [class.active]="activeTab() === 'active'" (click)="setTab('active')">Active Projects</button>
+    <button class="tab" [class.active]="activeTab() === 'details'" (click)="setTab('details')">Project Details</button>
+    <button class="tab" [class.active]="activeTab() === 'resources'" (click)="setTab('resources')">Resource Allocation</button>
   </div>
 
+  <!-- ===== Table Card ===== -->
   <div class="table-card">
     <table class="project-table">
       <thead>
@@ -76,78 +88,110 @@
       </tr>
       </thead>
       <tbody>
-      @for (project of pagedProjects(); track project.id) {
-      <tr
-        class="project-row"
-        [class.selected]="selectedProject()?.id === project.id"
-        (click)="selectProject(project)"
-      >
-        <td class="td-name">
-          <div class="project-name">{{ project.name }}</div>
-          <div class="project-meta">{{ project.type }} · {{ project.location }}</div>
-        </td>
-        <td>
+
+      <!-- Loading state -->
+      @if (isLoading()) {
+        <tr>
+          <td colspan="7" class="loading-row">
+            <div class="spinner-wrapper">
+              <div class="spinner"></div>
+              <span class="loading-text">Searching projects…</span>
+            </div>
+          </td>
+        </tr>
+      }
+
+      <!-- Results -->
+      @if (!isLoading()) {
+        @for (project of pagedProjects(); track project.id) {
+          <tr
+            class="project-row"
+            [class.selected]="selectedProject()?.id === project.id"
+            (click)="selectProject(project)"
+          >
+            <td class="td-name">
+              <div class="project-name">{{ project.name }}</div>
+              <div class="project-meta">{{ project.type }} · {{ project.location }}</div>
+            </td>
+            <td>
               <span class="status-badge" [class]="getStatusClass(project.status)">
                 {{ formatStatus(project.status) }}
               </span>
-        </td>
-        <td>
-          <div class="manager-cell">
-            <span class="manager-avatar">{{ project.managerInitials }}</span>
-            <span class="manager-name">{{ project.manager }}</span>
-          </div>
-        </td>
-        <td>
-          <div class="timeline-cell">
-            <span class="timeline-start">{{ project.startDate }}</span>
-            <span class="timeline-end">End: {{ project.endDate }}</span>
-          </div>
-        </td>
-        <td>
-          <div class="budget-cell">
+            </td>
+            <td>
+              <div class="manager-cell">
+                <span class="manager-avatar">{{ project.managerInitials }}</span>
+                <span class="manager-name">{{ project.manager }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="timeline-cell">
+                <span class="timeline-start">{{ project.startDate }}</span>
+                <span class="timeline-end">End: {{ project.endDate }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="budget-cell">
                 <span class="budget-label" [class]="getBudgetClass(project.budgetStatus)">
                   {{ project.budgetStatus }}
                 </span>
-            <span class="budget-amount">{{ project.budgetUsed }} / {{ project.budgetTotal }}</span>
-          </div>
-        </td>
-        <td>
-          <div class="progress-cell">
-            <div class="progress-bar-track">
-              <div
-                class="progress-bar-fill"
-                [style.width.%]="project.progress"
-                [style.backgroundColor]="getProgressColor(project.progress)"
-              ></div>
-            </div>
-            <span class="progress-text">{{ project.progress }}%</span>
-          </div>
-        </td>
-        <td class="td-actions">
-          <button class="row-action-btn" matRipple (click)="openEditDialog(project, $event)" title="Edit">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button class="row-action-btn delete" matRipple (click)="deleteProject(project, $event)" title="Delete">
-            <mat-icon>delete_outline</mat-icon>
-          </button>
-        </td>
-      </tr>
+                <span class="budget-amount">{{ project.budgetUsed }} / {{ project.budgetTotal }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="progress-cell">
+                <div class="progress-bar-track">
+                  <div
+                    class="progress-bar-fill"
+                    [style.width.%]="project.progress"
+                    [style.backgroundColor]="getProgressColor(project.progress)"
+                  ></div>
+                </div>
+                <span class="progress-text">{{ project.progress }}%</span>
+              </div>
+            </td>
+            <td class="td-actions">
+              <button class="row-action-btn" matRipple (click)="openEditDialog(project, $event)" title="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="row-action-btn delete" matRipple (click)="deleteProject(project, $event)" title="Delete">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </td>
+          </tr>
+        }
+
+        <!-- Empty state -->
+        @if (pagedProjects().length === 0) {
+          <tr>
+            <td colspan="7" class="empty-state">
+              @if (searchKeyword() || statusFilter() !== 'all' || managerFilter() > 0) {
+                <div class="empty-search">
+                  <mat-icon class="empty-icon">search_off</mat-icon>
+                  <p>No projects match your search criteria.</p>
+                  <button class="clear-filters-btn" (click)="clearSearch()">Clear filters</button>
+                </div>
+              } @else {
+                No projects found.
+              }
+            </td>
+          </tr>
+        }
       }
-      @if (pagedProjects().length === 0) {
-      <tr>
-        <td colspan="7" class="empty-state">No projects found.</td>
-      </tr>
-      }
+
       </tbody>
     </table>
 
     <div class="table-footer">
       <span class="showing-text">
-        Showing {{ pagedProjects().length }} of {{ filteredProjects().length }} projects
+        @if (!isLoading()) {
+          Showing {{ pagedProjects().length }} of {{ searchResults().length }} projects
+        }
       </span>
       <div class="pagination-btns">
-        <button class="page-btn" [disabled]="currentPage() <= 1" (click)="prevPage()">Previous</button>
-        <button class="page-btn" [disabled]="currentPage() >= totalPages()" (click)="nextPage()">Next</button>
+        <button class="page-btn" [disabled]="currentPage() <= 1 || isLoading()" (click)="prevPage()">Previous</button>
+        <span class="page-indicator">{{ currentPage() }} / {{ totalPages() || 1 }}</span>
+        <button class="page-btn" [disabled]="currentPage() >= totalPages() || isLoading()" (click)="nextPage()">Next</button>
       </div>
     </div>
   </div>

@@ -51,7 +51,7 @@
 
   <div class="task-list">
     @for (task of filteredTasks(); track task.taskId) {
-      <div class="task-item-card" [class.completed]="task.status === 'DONE'">
+      <div class="task-item-card" [class.completed]="task.status === 'DONE'" (click)="openTaskDetail(task)" style="cursor: pointer;">
         <div class="task-item-header">
           <div class="task-badges">
             <span class="status-badge" 
@@ -62,7 +62,7 @@
             </span>
             <span class="project-tag">#PRJ-{{ task.projectId }}</span>
           </div>
-          <div class="task-actions">
+          <div class="task-actions" (click)="$event.stopPropagation()">
             @if(task.status !== 'DONE') {
               <button class="btn btn-outline" [class.btn-outline-orange]="task.status === 'TODO'" [class.btn-dark]="task.status === 'IN_PROGRESS'">
                 {{ task.status === 'TODO' ? 'Start Task' : 'Update Status' }}

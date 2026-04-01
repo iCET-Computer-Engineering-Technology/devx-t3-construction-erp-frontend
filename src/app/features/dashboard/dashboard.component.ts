@@ -152,4 +152,9 @@ export class DashboardComponent implements OnInit {
   getBarHeight(value: number): number {
     return Math.round((value / 100) * 140);
   }
+
+  projectDetails: any;
+  constructor(private clientService: ClientViewService) {}
+
+  
 }

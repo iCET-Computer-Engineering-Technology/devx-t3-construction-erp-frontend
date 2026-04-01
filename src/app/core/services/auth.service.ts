@@ -5,19 +5,35 @@ import { AuthResponse, LoginRequest } from '../models/auth.model';
 import { UserRole } from '../models/user.model';
 import { Router } from '@angular/router';
 
+export interface CurrentUserInfo {
+    name: string;
+    role: UserRole;
+    email?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = 'http://localhost:8080/api/auth';
+    private apiUrl = '/api/auth';
     private tokenKey = 'jwt_token';
     private roleKey = 'user_role';
+    private nameKey = 'user_name';
+    private emailKey = 'user_email';
+
     private currentUserRoleSubject = new BehaviorSubject<UserRole | null>(
         (localStorage.getItem(this.roleKey) as UserRole) || this.getRoleFromToken(this.getToken())
     );
+
     public currentUserRole$ = this.currentUserRoleSubject.asObservable();
 
     constructor(private http: HttpClient, private router: Router) { }
+
+    private currentUserInfoSubject = new BehaviorSubject<CurrentUserInfo | null>(
+        this.buildUserInfoFromStorage()
+    );
+
+    public currentUserInfo$ = this.currentUserInfoSubject.asObservable(); 
 
     login(credentials: LoginRequest): Observable<any> {
         return this.http.post<any>(`${this.apiUrl}/login`, credentials, { responseType: 'json' as const }).pipe(
@@ -25,30 +41,36 @@ export class AuthService {
                 console.log('Raw login response:', rawResponse);
                 let response = rawResponse;
 
-                // Handle cases where response might be stringified JSON
                 if (typeof response === 'string') {
                     try { response = JSON.parse(response); } catch (e) { }
                 }
-
-                // Unpack from common wrapper objects or arrays
+ 
                 if (Array.isArray(response) && response.length > 0) response = response[0];
                 if (response?.data) response = response.data;
                 if (response?.body) response = response.body;
 
                 console.log('Processed login response:', response);
+ 
+                if (response?.token) { 
+                    this.setToken(response.token); 
+                    const role = response.role as UserRole; 
+                    
+                    if (role) {
+                        localStorage.setItem(this.roleKey, role);
+                    } else {
+                        console.warn("Backend eken role eka awilla naha!");
+                    }
 
-                if (response?.token) {
-                    this.setToken(response.token);
-                    const role = this.getRoleFromToken(response.token) as UserRole;
-                    if (role) localStorage.setItem(this.roleKey, role);
+                    // save karanawa other details
+                    if (response?.name) localStorage.setItem(this.nameKey, response.name);
+                    if (response?.email) localStorage.setItem(this.emailKey, response.email);
+
+                    //  update current status 
                     this.currentUserRoleSubject.next(role);
-                } else if (response?.role) {
-                    // Fallback for when backend returns a User object instead of a JWT token
-                    this.setToken('session-active'); // placeholder so isLoggedIn passes
-                    localStorage.setItem(this.roleKey, response.role as string);
-                    this.currentUserRoleSubject.next(response.role as UserRole);
+                    this.currentUserInfoSubject.next(this.buildUserInfoFromStorage());
+                    
                 } else {
-                    console.error('Response did not contain a role or token!', response);
+                    console.error('Response did not contain a token!', response);
                 }
             })
         );
@@ -57,7 +79,10 @@ export class AuthService {
     logout(): void {
         localStorage.removeItem(this.tokenKey);
         localStorage.removeItem(this.roleKey);
+        localStorage.removeItem(this.nameKey);
+        localStorage.removeItem(this.emailKey);
         this.currentUserRoleSubject.next(null);
+        this.currentUserInfoSubject.next(null);
         this.router.navigate(['/login']);
     }
 
@@ -92,6 +117,24 @@ export class AuthService {
         return this.currentUserRoleSubject.value === UserRole.ADMIN;
     }
 
+    getCurrentUserInfo(): CurrentUserInfo | null {
+        return this.currentUserInfoSubject.value;
+    }
+
+    getCurrentRole(): UserRole | null {
+        return this.currentUserRoleSubject.value;
+    }
+
+    private buildUserInfoFromStorage(): CurrentUserInfo | null {
+        const role = localStorage.getItem(this.roleKey) as UserRole;
+        if (!role) return null;
+        return {
+            name: localStorage.getItem(this.nameKey) || 'User',
+            role,
+            email: localStorage.getItem(this.emailKey) || undefined,
+        };
+    }
+
     private decodeToken(token: string | null): any {
         if (!token) return null;
         try {
@@ -116,10 +159,12 @@ export class AuthService {
         let role = decoded.role || decoded.roles?.[0] || decoded.authority || decoded.authorities?.[0];
 
         // TEMPORARY FIX: If the backend's JWT doesn't include a role (e.g. only contains 'sub'), default to ADMIN so you can log in.
-        if (!role && decoded.sub) {
-            console.warn('No role found in JWT! Defaulting to ADMIN based on sub.');
-            role = UserRole.ADMIN;
-        }
+        console.log("Role eka : ",role);
+        
+        // if (!role && decoded.sub) {
+        //     console.warn('No role found in JWT! Defaulting to ADMIN based on sub.');
+        //     role = UserRole.ADMIN;
+        // }
 
         return role ? role as UserRole : null;
     }

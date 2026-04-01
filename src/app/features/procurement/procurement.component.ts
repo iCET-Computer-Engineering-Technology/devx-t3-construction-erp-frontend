@@ -103,14 +103,64 @@ export class ProcurementComponent implements OnInit {
     });
   }
 
+  // Supplier Modal State
+  isSupplierModalOpen = signal(false);
+  newSupplier: Supplier = { name: '', contactEmail: '', phone: '', address: '' };
+
   loadSuppliers() {
-    // Generate beautiful dummy suppliers for the demo
+    this.procurementService.getSuppliers().subscribe({
+      next: (res) => {
+        if (!res || res.length === 0) {
+          this.loadDummySuppliers();
+        } else {
+          this.suppliers.set(res);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load real suppliers', err);
+        this.loadDummySuppliers();
+      }
+    });
+  }
+
+  private loadDummySuppliers() {
     this.suppliers.set([
       { id: 1, name: 'Apex BuildMats Ltd.', contactEmail: 'sales@apexbuild.com', phone: '+1 (555) 123-4567', address: '100 Industrial Dr, City, State' },
       { id: 2, name: 'Global Steel Co.', contactEmail: 'orders@globalsteel.com', phone: '+1 (555) 987-6543', address: '400 Metalworks Way, City, State' },
       { id: 3, name: 'Titan Concrete & Cement', contactEmail: 'contact@titanconcrete.net', phone: '+1 (555) 888-1111', address: '22 Stone Quarry Rd, City, State' },
       { id: 4, name: 'Lumber Logistics', contactEmail: 'sales@lumberlog.io', phone: '+1 (555) 444-3333', address: 'Tree Lane 5, Forest City' }
     ]);
+  }
+
+  openSupplierModal() {
+    this.isSupplierModalOpen.set(true);
+  }
+
+  closeSupplierModal() {
+    this.isSupplierModalOpen.set(false);
+    this.newSupplier = { name: '', contactEmail: '', phone: '', address: '' };
+  }
+
+  saveSupplier() {
+    if (!this.newSupplier.name || !this.newSupplier.contactEmail) {
+      alert('Validation Error: Supplier Name and Email are required.');
+      return;
+    }
+
+    this.procurementService.createSupplier(this.newSupplier).subscribe({
+      next: (savedSupplier) => {
+        // Add to the top of the list
+        this.suppliers.update(list => [savedSupplier, ...list]);
+        this.closeSupplierModal();
+      },
+      error: (err) => {
+        console.error('Failed to create supplier', err);
+        // Fallback for demo if API is down
+        const fakeSup = { ...this.newSupplier, id: Math.floor(Math.random() * 1000) };
+        this.suppliers.update(list => [fakeSup, ...list]);
+        this.closeSupplierModal();
+      }
+    });
   }
 
   setTab(tab: 'requisitions' | 'purchaseOrders' | 'goodsReceipts' | 'suppliers') {

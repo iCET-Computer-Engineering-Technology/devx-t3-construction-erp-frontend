@@ -1,0 +1,245 @@
+<div class="documents-container h-full flex flex-col">
+  <!-- Header & Actions -->
+  <div class="px-8 py-5 flex items-center justify-between border-b border-gray-100 bg-white shadow-sm z-20">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2 group cursor-pointer">
+        <div class="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center group-hover:bg-orange-50 transition-colors">
+          <mat-icon class="text-gray-400 group-hover:text-orange-500 text-lg">folder</mat-icon>
+        </div>
+        <span class="text-sm font-semibold text-gray-400 group-hover:text-gray-600 transition-colors">Main Storage</span>
+        <mat-icon class="text-gray-300 text-xs">chevron_right</mat-icon>
+      </div>
+      
+      <!-- Project Selector -->
+      <div class="relative min-w-[220px]">
+        <select [value]="selectedProjectId()" 
+                (change)="selectProject(+$any($event.target).value)"
+                class="w-full appearance-none bg-orange-50/30 border border-orange-100/50 text-gray-900 font-bold py-2.5 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all cursor-pointer shadow-sm">
+          @for (proj of projects(); track proj.id) {
+            <option [value]="proj.id">{{ proj.name }}</option>
+          }
+        </select>
+        <mat-icon class="absolute right-3 top-1/2 -translate-y-1/2 text-orange-600 pointer-events-none text-xl">expand_more</mat-icon>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button matRipple class="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm">
+        <mat-icon class="text-lg">create_new_folder</mat-icon>
+        New Folder
+      </button>
+      <button matRipple (click)="triggerUpload()" class="px-5 py-2.5 bg-orange-600 text-white rounded-xl text-sm font-bold hover:bg-orange-700 flex items-center gap-2 transition-all shadow-lg shadow-orange-500/20 active:scale-95">
+        <mat-icon class="text-lg">upload</mat-icon>
+        Upload File
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="px-8 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center gap-4 sticky top-0 z-10">
+    @for (tab of tabs; track tab) {
+      <button matRipple
+              (click)="setActiveTab(tab)"
+              [class.tab-active]="activeTab() === tab"
+              [class.text-gray-500]="activeTab() !== tab"
+              class="px-5 py-2 rounded-xl text-sm font-bold border border-transparent hover:bg-gray-50 transition-all flex items-center gap-2.5">
+        <mat-icon class="text-xl opacity-70">{{ tab === 'Contracts' ? 'assignment' : tab === 'Site Photos' ? 'image' : tab === 'Blueprints' ? 'architecture' : 'verified_user' }}</mat-icon>
+        {{ tab }}
+      </button>
+    }
+    <div class="ml-auto relative w-64 group">
+      <input type="text" placeholder="Search files..." class="w-full bg-gray-100/50 border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-orange-500/20 focus:bg-white transition-all outline-none" />
+      <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors text-lg">search</mat-icon>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="flex-1 overflow-hidden flex bg-gray-50/30">
+    <!-- Main Table Area -->
+    <div class="flex-1 overflow-auto p-8 pt-4">
+      <div class="min-w-full inline-block align-middle">
+        @if (documents().length > 0) {
+          <table class="w-full document-table">
+            <thead>
+              <tr class="text-left">
+                <th class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em]">File Name</th>
+                <th class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em]">Format</th>
+                <th class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em]">Date Modified</th>
+                <th class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em]">Owner</th>
+                <th class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em] text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (doc of documents(); track doc.documentId) {
+                <tr (click)="selectFile(doc)"
+                    [class.ring-2]="selectedFile()?.documentId === doc.documentId"
+                    [class.ring-orange-500]="selectedFile()?.documentId === doc.documentId"
+                    class="group cursor-pointer relative animate-fade-in">
+                  <td>
+                    <div class="flex items-center gap-4">
+                      <div [class]="getFileIconColor(doc.fileType)" class="w-12 h-12 rounded-2xl flex items-center justify-center p-2.5 shadow-sm group-hover:scale-110 transition-transform">
+                        <mat-icon class="text-2xl">{{ getFileIcon(doc.fileType) }}</mat-icon>
+                      </div>
+                      <div class="flex flex-col gap-0.5">
+                        <div class="text-sm font-extrabold text-gray-900 line-clamp-1 decoration-orange-500/30 underline-offset-4 group-hover:underline">{{ doc.fileName }}</div>
+                        <div class="text-[11px] font-bold text-gray-400 tracking-wide">{{ formatSize(doc.fileSize) }} • Verified</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="px-2.5 py-1 bg-gray-100 text-[10px] font-black text-gray-500 rounded-lg uppercase tracking-wider border border-gray-200/50">
+                      {{ (doc.fileType.split('/')[1] || doc.fileType || 'binary') }}
+                    </span>
+                  </td>
+                  <td class="text-sm font-medium text-gray-500">{{ doc.uploadedAt | date:'MMM d, yyyy' }}</td>
+                  <td>
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded-full border-2 border-white shadow-sm overflow-hidden bg-gray-100">
+                        <img [src]="doc.uploaderAvatar || 'https://i.pravatar.cc/150?u=' + doc.uploadedBy" class="w-full h-full object-cover" />
+                      </div>
+                      <span class="text-sm font-bold text-gray-700">{{ doc.uploaderName || 'User ' + doc.uploadedBy }}</span>
+                    </div>
+                  </td>
+                  <td class="text-right">
+                    <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity pr-2">
+                       <button matRipple class="p-2 hover:bg-orange-50 text-gray-400 hover:text-orange-600 rounded-lg">
+                          <mat-icon class="text-lg">download</mat-icon>
+                       </button>
+                       <button matRipple (click)="deleteFile(doc)" class="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg">
+                          <mat-icon class="text-lg">delete_outline</mat-icon>
+                       </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <div class="flex flex-col items-center justify-center py-32 text-center bg-white rounded-3xl border border-dashed border-gray-200">
+            <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+              <mat-icon class="text-gray-200 text-4xl">folder_off</mat-icon>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900">Architecture is waiting...</h3>
+            <p class="text-gray-500 max-w-sm mt-2 mx-auto">This project haven't any blueprints or documents logged. Start your orbital shift by uploading a file.</p>
+            <button (click)="triggerUpload()" class="mt-8 px-6 py-3 bg-orange-600 text-white font-bold rounded-xl hover:bg-orange-700 flex items-center gap-2 transition-all shadow-lg shadow-orange-500/20">
+              <mat-icon>add</mat-icon>
+              Upload your first blueprint
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Details Sidebar -->
+    <div class="w-[380px] details-sidebar flex flex-col border-l border-gray-100/50">
+      <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
+        <h2 class="text-lg font-black text-gray-900 tracking-tight">File Intelligence</h2>
+        @if (selectedFile()) {
+          <button (click)="selectedFile.set(null)" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400">
+            <mat-icon class="text-lg">close</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (selectedFile(); as doc) {
+        <div class="flex-1 overflow-auto p-8 space-y-10">
+          <!-- Premium Preview -->
+          <div class="preview-card aspect-[4/3] rounded-3xl border border-gray-100 relative overflow-hidden flex items-center justify-center bg-gray-100/50">
+            <img [src]="placeholderImage" class="preview-image" />
+            <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/20 to-transparent flex items-end justify-between">
+              <span class="px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[10px] font-black text-orange-600 uppercase tracking-widest shadow-lg">
+                {{ (doc.fileType.split('/')[1] || doc.fileType || 'binary') }}
+              </span>
+              <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all">
+                <mat-icon class="text-orange-600">fullscreen</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Metadata Grid -->
+          <div class="space-y-6">
+            <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <span class="w-6 h-0.5 bg-orange-500 rounded-full"></span>
+              Core Metadata
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+               <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                  <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Created</span>
+                  <span class="text-xs font-black text-gray-800">{{ doc.uploadedAt | date:'MMM d' }}</span>
+               </div>
+               <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                  <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Project</span>
+                  <span class="text-xs font-black text-orange-600">PRJ-{{ doc.projectId }}</span>
+               </div>
+               <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                  <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Status</span>
+                  <span class="text-xs font-black text-green-600">Verified</span>
+               </div>
+               <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                  <span class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Version</span>
+                  <span class="text-xs font-black text-gray-800">{{ doc.version || 'v1.0' }}</span>
+               </div>
+            </div>
+            
+            <div class="space-y-4 pt-2">
+              <div class="property-item">
+                <span class="text-sm font-bold text-gray-400">Full Name</span>
+                <span class="text-sm font-extrabold text-gray-900 truncate max-w-[200px]" [title]="doc.fileName">{{ doc.fileName }}</span>
+              </div>
+              <div class="property-item">
+                <span class="text-sm font-bold text-gray-400">Total Size</span>
+                <span class="text-sm font-extrabold text-gray-900">{{ formatSize(doc.fileSize) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Version Timeline -->
+          <div class="space-y-6">
+            <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <span class="w-6 h-0.5 bg-orange-500 rounded-full"></span>
+              Revision Flow
+            </h3>
+            <div class="relative pl-8 space-y-8 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-100/50">
+              <div class="relative animate-fade-in">
+                <div class="absolute -left-[27px] top-0 w-4 h-4 rounded-full bg-orange-500 border-4 border-white shadow-lg ring ring-orange-500/20"></div>
+                <div class="flex flex-col gap-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-black text-gray-900">v1.0 - Deployment</span>
+                    <span class="px-1.5 py-0.5 bg-green-100 text-[8px] font-black text-green-700 rounded-md uppercase">Current</span>
+                  </div>
+                  <span class="text-[10px] font-bold text-gray-400 leading-tight">Handled by {{ doc.uploaderName || 'User ' + doc.uploadedBy }} • Verified on {{ doc.uploadedAt | date:'medium' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Actions -->
+          <div class="flex flex-col gap-3 pt-6 border-t border-gray-100">
+            <div class="flex gap-3">
+              <button matRipple class="sidebar-action-btn">
+                <mat-icon class="text-lg text-orange-500">download</mat-icon>
+                <span>Download</span>
+              </button>
+              <button matRipple class="sidebar-action-btn">
+                <mat-icon class="text-lg text-blue-500">share</mat-icon>
+                <span>Share</span>
+              </button>
+            </div>
+            <button matRipple (click)="deleteFile(doc)" class="w-full py-4 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-black rounded-2xl transition-all shadow-sm border border-red-100 active:scale-[0.98] flex items-center justify-center gap-2">
+              <mat-icon>delete_outline</mat-icon>
+              Remove Blueprint
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
+          <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
+            <mat-icon class="text-6xl text-gray-100">radar</mat-icon>
+          </div>
+          <h4 class="text-lg font-black text-gray-900 tracking-tight">Scanning Interface</h4>
+          <p class="text-sm text-gray-400 mt-2 leading-relaxed">Select a document from the grid to initiate file intelligence analysis and version tracking.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -5,11 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { ProjectService } from '../services/project.service';
 import { ProjectProgressComponent } from '../project-progress/project-progress';
+import { ProjectBudgetComponent } from '../project-budget/project-budget.component';
 
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatRippleModule, ProjectProgressComponent],
+  imports: [CommonModule, MatIconModule, MatRippleModule, ProjectProgressComponent, ProjectBudgetComponent],
   templateUrl: './project-details.component.html',
   styleUrl: './project-details.component.css'
 })

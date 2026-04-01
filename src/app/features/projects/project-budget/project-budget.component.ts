@@ -1,101 +1,133 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BudgetService, Budget, BudgetItem, Expense } from '../services/budget.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
-import { ProjectService } from '../services/project.service'; // Import the service!
 
 @Component({
   selector: 'app-project-budget',
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatRippleModule],
-  templateUrl: './project-budget.component.html'
+  templateUrl: './project-budget.component.html',
+  styleUrls: ['./project-budget.component.css']
 })
 export class ProjectBudgetComponent implements OnInit {
   @Input({ required: true }) projectId!: number;
-
-  // Use the ProjectService instead of HttpClient
-  private projectService = inject(ProjectService);
-
-  budget = signal<number | null>(null);
-  isEditing = signal(false);
-  editValue = signal<number>(0);
-  isLoading = signal(true);
-  errorMessage = signal('');
-
-  ngOnInit() {
-    this.fetchBudget();
+  
+  private budgetService = inject(BudgetService);
+  
+  budget = signal<Budget | null>(null);
+  budgetItems = signal<BudgetItem[]>([]);
+  isLoading = signal<boolean>(true);
+  
+  ngOnInit(): void {
+    this.loadBudget();
   }
-
-  fetchBudget() {
+  
+  loadBudget() {
     this.isLoading.set(true);
-    // Call the service method
-    this.projectService.getProjectBudget(this.projectId).subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          this.budget.set(res.data.totalBudget);
-          this.editValue.set(res.data.totalBudget);
+    this.budgetService.getBudgetByProjectId(this.projectId).subscribe({
+      next: (b) => {
+        this.budget.set(b);
+        if (b.id) {
+          this.loadBudgetItems(b.id);
+        } else {
+          this.isLoading.set(false);
         }
-        this.isLoading.set(false);
       },
-      error: (err) => {
-        if (err.status !== 404) {
-          this.errorMessage.set('Failed to load budget.');
-        }
+      error: () => {
+        // No budget exists yet
+        this.budget.set(null);
         this.isLoading.set(false);
       }
     });
   }
-
-  startEdit() {
-    this.editValue.set(this.budget() || 0);
-    this.isEditing.set(true);
-    this.errorMessage.set('');
-  }
-
-  cancelEdit() {
-    this.isEditing.set(false);
-    this.errorMessage.set('');
-  }
-
-  saveBudget() {
-    const currentVal = this.editValue();
-
-    if (currentVal === null || currentVal === undefined || currentVal <= 0) {
-      this.errorMessage.set('Budget must be greater than 0.');
-      return;
-    }
-
-    const decimalCheck = currentVal.toString().split('.');
-    if (decimalCheck[1] && decimalCheck[1].length > 2) {
-      this.errorMessage.set('Budget cannot have more than 2 decimal places.');
-      return;
-    }
-
-    this.isLoading.set(true);
-    const hasExistingBudget = this.budget() !== null;
-    const method = hasExistingBudget ? 'patch' : 'post';
-
-    // Call the service method
-    this.projectService.saveProjectBudget(this.projectId, currentVal, method).subscribe({
-      next: (res: any) => {
-        if (res.success) {
-          this.budget.set(res.data.totalBudget);
-          this.isEditing.set(false);
-          this.errorMessage.set('');
-        }
+  
+  loadBudgetItems(budgetId: number) {
+    this.budgetService.getBudgetItems(budgetId).subscribe({
+      next: (items) => {
+        this.budgetItems.set(items);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        if (err.status === 403) {
-          this.errorMessage.set('Warning: Only Project Managers and Admins can modify the budget.');
-        } else if (err.status === 401) {
-          this.errorMessage.set('Warning: You must be logged in to save the budget.');
-        } else {
-          this.errorMessage.set(err.error?.message || 'Error saving budget.');
-        }
+      error: () => {
+        this.budgetItems.set([]);
         this.isLoading.set(false);
       }
+    });
+  }
+  
+  createBudget() {
+    this.isLoading.set(true);
+    const newBudget: Budget = {
+      total_estimated_amount: 0,
+      status: 'DRAFT'
+    };
+    
+    this.budgetService.createBudget(this.projectId, newBudget).subscribe({
+      next: (id) => {
+        this.loadBudget(); 
+      },
+      error: (err) => {
+        console.error('Error creating budget', err);
+        this.isLoading.set(false);
+      }
+    });
+  }
+  
+  getVariance(item: BudgetItem): number {
+    const est = item.estimated_amount || 0;
+    const comm = item.committed_amount || 0;
+    const act = item.actual_amount || 0;
+    return est - (comm + act);
+  }
+
+  getTotalCommitted(): number {
+    return this.budgetItems().reduce((acc, curr) => acc + (curr.committed_amount || 0), 0);
+  }
+
+  getTotalActual(): number {
+    return this.budgetItems().reduce((acc, curr) => acc + (curr.actual_amount || 0), 0);
+  }
+
+  getTotalVariance(): number {
+    const est = this.budget()?.total_estimated_amount || 0;
+    return est - (this.getTotalCommitted() + this.getTotalActual());
+  }
+
+  addExampleBudgetItem() {
+    const b = this.budget();
+    if (!b || !b.id) return;
+    
+    const randomCode = `0${Math.floor(Math.random() * 9) + 1}-Mat`;
+    const newItem: BudgetItem = {
+      cost_code: randomCode,
+      description: 'Example Construction Material',
+      estimated_amount: Math.floor(Math.random() * 50000) + 10000,
+      committed_amount: 0,
+      actual_amount: 0
+    };
+
+    this.budgetService.addBudgetItem(b.id, newItem).subscribe(() => {
+      this.loadBudgetItems(b.id!);
+      
+      const currentBudget = this.budget();
+      if (currentBudget) {
+        currentBudget.total_estimated_amount = (currentBudget.total_estimated_amount || 0) + (newItem.estimated_amount || 0);
+        this.budget.set({...currentBudget});
+      }
+    });
+  }
+
+  logExampleExpense(item: BudgetItem) {
+    if (!item.id) return;
+    const expense: Expense = {
+      amount: Math.floor(Math.random() * 5000) + 500,
+      expense_type: 'MATERIAL',
+      reference_id: 'EXP-' + Math.floor(Math.random() * 10000)
+    };
+    this.budgetService.logExpense(item.id, expense).subscribe(() => {
+      this.loadBudgetItems(this.budget()!.id!);
     });
   }
 }

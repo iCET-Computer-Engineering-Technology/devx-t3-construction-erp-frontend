@@ -47,14 +47,44 @@ export class TasksComponent {
         }).filter(p => p.totalTasks > 0 || selectedId); // Show if has tasks OR if explicitly selected
     });
 
+    readonly selectedTask = signal<Task | null>(null);
+
     onNewTaskClick() {
         this.router.navigate(["/tasks/new"]);
     }
 
     openTaskDetail(task: Task) {
-        this.dialog.open(TaskDetailComponent, {
-            width: '600px',
-            data: { task }
+        this.selectedTask.set(task);
+    }
+
+    closeTaskDetail() {
+        this.selectedTask.set(null);
+    }
+
+    updateTaskStatus(taskId: number, newStatus: TaskStatus) {
+        this.taskService.updateTaskStatus(taskId, newStatus).subscribe({
+            next: () => {
+                // Close modal and let the UI refresh its kanban board automatically via the signal
+                if (this.selectedTask()?.taskId === taskId) {
+                    this.closeTaskDetail();
+                }
+            },
+            error: (err) => {
+                console.error('Failed to update task status', err);
+                
+                // DEMO FALLBACK: If backend PATCH fails or is unimplemented, update local signal manually
+                alert('Backend update failed. Falling back to local state update for demo.');
+                const currentTasks = this.taskService['tasksSignal']();
+                const index = currentTasks.findIndex(t => t.taskId === taskId);
+                if (index !== -1) {
+                    const updated = [...currentTasks];
+                    updated[index] = { ...updated[index], status: newStatus };
+                    this.taskService['tasksSignal'].set(updated);
+                }
+                if (this.selectedTask()?.taskId === taskId) {
+                    this.closeTaskDetail();
+                }
+            }
         });
     }
 

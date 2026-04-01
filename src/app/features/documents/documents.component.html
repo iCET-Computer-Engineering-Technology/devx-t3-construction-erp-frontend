@@ -88,7 +88,7 @@
                   </td>
                   <td>
                     <span class="px-2.5 py-1 bg-gray-100 text-[10px] font-black text-gray-500 rounded-lg uppercase tracking-wider border border-gray-200/50">
-                      {{ (doc.fileType?.split('/')?.[1] || doc.fileType || 'binary') }}
+                      {{ (doc.fileType.split('/')[1] || doc.fileType || 'binary') }}
                     </span>
                   </td>
                   <td class="text-sm font-medium text-gray-500">{{ doc.uploadedAt | date:'MMM d, yyyy' }}</td>
@@ -148,7 +148,7 @@
             <img [src]="placeholderImage" class="preview-image" />
             <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/20 to-transparent flex items-end justify-between">
               <span class="px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[10px] font-black text-orange-600 uppercase tracking-widest shadow-lg">
-                {{ (doc.fileType?.split('/')?.[1] || doc.fileType || 'binary') }}
+                {{ (doc.fileType.split('/')[1] || doc.fileType || 'binary') }}
               </span>
               <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all">
                 <mat-icon class="text-orange-600">fullscreen</mat-icon>

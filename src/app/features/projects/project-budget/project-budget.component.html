@@ -1,87 +1,106 @@
-<div class="bg-white rounded-xl shadow-sm border-l-4 border-orange-500 p-6 mb-6">
-  <div class="flex items-center justify-between mb-4">
-    <div class="flex items-center gap-3">
-      <div class="p-2 bg-orange-50 rounded-lg text-orange-600 flex items-center justify-center">
-        <mat-icon>account_balance</mat-icon>
-      </div>
-      <div>
-        <h3 class="text-lg font-bold text-gray-800 m-0">Project Budget</h3>
-        <p class="text-xs text-gray-500 m-0">Financial limits and tracking</p>
-      </div>
-    </div>
-
-    @if (!isEditing() && !isLoading()) {
-    <button
-      matRipple
-      (click)="startEdit()"
-      class="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-600 hover:bg-orange-100 rounded-lg text-sm font-semibold transition-colors border-none cursor-pointer">
-      <mat-icon style="font-size: 18px; width: 18px; height: 18px;">edit</mat-icon>
-      {{ budget() === null ? 'Set Budget' : 'Edit Budget' }}
-    </button>
-    }
+<div class="budget-dashboard">
+  <div class="dashboard-header">
+    <h3 class="dashboard-title">
+      <mat-icon class="title-icon">account_balance_wallet</mat-icon>
+      Financial Overview
+    </h3>
   </div>
 
   @if (isLoading()) {
-  <div class="flex items-center gap-2 text-gray-500 py-4">
-    <mat-icon class="animate-spin">sync</mat-icon>
-    <span class="text-sm">Processing budget data...</span>
-  </div>
+    <div class="loading-state">
+      <mat-icon class="spin-icon">sync</mat-icon>
+      <span>Loading budget data...</span>
+    </div>
   } @else {
-  <div class="mt-4">
-    @if (!isEditing()) {
-    <div class="flex flex-col">
-      <span class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Allocated Budget</span>
-      @if (budget() !== null) {
-      <span class="text-3xl font-bold text-gray-800">
-              {{ budget() | currency:'USD':'symbol':'1.2-2' }}
-            </span>
-      } @else {
-      <span class="text-lg font-medium text-gray-400 italic">No budget allocated yet.</span>
-      }
-    </div>
-    }
-
-    @if (isEditing()) {
-    <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-      <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-        Enter Total Budget Amount ($)
-      </label>
-      <div class="flex flex-wrap items-center gap-3">
-        <div class="relative flex-1 min-w-[200px]">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold">$</span>
-          <input
-            type="number"
-            [ngModel]="editValue()"
-            (ngModelChange)="editValue.set($event)"
-            min="0.01"
-            step="0.01"
-            class="w-full h-11 pl-8 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-gray-800 font-medium bg-white"
-            placeholder="0.00"
-          />
+    @if (!budget()) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">request_quote</mat-icon>
+        <p>No budget allocated for this project yet.</p>
+        <button class="create-budget-btn" matRipple (click)="createBudget()">
+          Initialize Budget
+        </button>
+      </div>
+    } @else {
+      <!-- Summary Cards -->
+      <div class="budget-summary-cards">
+        <div class="summary-card est-card">
+          <div class="card-icon"><mat-icon>account_balance</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Total Estimated</span>
+            <span class="card-value">{{ budget()?.total_estimated_amount || 0 | currency }}</span>
+          </div>
         </div>
-        <button
-          matRipple
-          (click)="saveBudget()"
-          class="h-11 px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-semibold transition-colors border-none cursor-pointer flex items-center gap-2">
-          <mat-icon style="font-size: 18px; width: 18px; height: 18px;">save</mat-icon>
-          Save
-        </button>
-        <button
-          matRipple
-          (click)="cancelEdit()"
-          class="h-11 px-4 bg-transparent hover:bg-gray-200 text-gray-600 rounded-lg text-sm font-semibold transition-colors border border-gray-300 cursor-pointer">
-          Cancel
+        <div class="summary-card comm-card">
+          <div class="card-icon"><mat-icon>assignment</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Committed Costs</span>
+            <span class="card-value">{{ getTotalCommitted() | currency }}</span>
+          </div>
+        </div>
+        <div class="summary-card act-card">
+          <div class="card-icon"><mat-icon>payments</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Actual Costs</span>
+            <span class="card-value">{{ getTotalActual() | currency }}</span>
+          </div>
+        </div>
+        <div class="summary-card var-card" [class.negative-variance]="getTotalVariance() < 0">
+          <div class="card-icon"><mat-icon>trending_flat</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Variance</span>
+            <span class="card-value">{{ getTotalVariance() | currency }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="action-bar">
+        <h4>Cost Codes Breakdown</h4>
+        <button class="add-item-btn" matRipple (click)="addExampleBudgetItem()">
+          <mat-icon>add</mat-icon> New Cost Code
         </button>
       </div>
 
-      @if (errorMessage()) {
-      <div class="mt-3 text-sm text-red-600 flex items-center gap-1">
-        <mat-icon style="font-size: 16px; width: 16px; height: 16px;">error_outline</mat-icon>
-        {{ errorMessage() }}
+      <!-- Detail Table -->
+      <div class="table-container">
+        <table class="budget-table">
+          <thead>
+            <tr>
+              <th>Cost Code</th>
+              <th>Description</th>
+              <th class="money-col">Estimated</th>
+              <th class="money-col">Committed</th>
+              <th class="money-col">Actual</th>
+              <th class="money-col">Variance</th>
+              <th class="action-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of budgetItems(); track item.id) {
+              <tr>
+                <td class="code-cell"><span class="code-badge">{{ item.cost_code }}</span></td>
+                <td>{{ item.description }}</td>
+                <td class="money-cell">{{ item.estimated_amount | currency }}</td>
+                <td class="money-cell">{{ item.committed_amount | currency }}</td>
+                <td class="money-cell">{{ item.actual_amount | currency }}</td>
+                <td class="money-cell" [class.negative-text]="getVariance(item) < 0">
+                  {{ getVariance(item) | currency }}
+                </td>
+                <td class="action-cell">
+                  <button class="log-expense-btn" title="Log Expense" (click)="logExampleExpense(item)">
+                    <mat-icon>receipt_long</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (budgetItems().length === 0) {
+              <tr>
+                <td colspan="7" class="empty-table-row">No cost codes defined. Add one to start tracking.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
-      }
-    </div>
     }
-  </div>
   }
 </div>

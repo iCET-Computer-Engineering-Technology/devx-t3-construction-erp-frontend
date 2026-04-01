@@ -10,7 +10,7 @@ import { ProjectBudgetComponent } from '../project-budget/project-budget.compone
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatRippleModule, ProjectProgressComponent,ProjectBudgetComponent],
+  imports: [CommonModule, MatIconModule, MatRippleModule, ProjectProgressComponent, ProjectBudgetComponent],
   templateUrl: './project-details.component.html',
   styleUrl: './project-details.component.css'
 })

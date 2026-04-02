@@ -36,7 +36,7 @@ import { UserService } from '../../../core/services/user.service';
 export class TaskService {
   private readonly http = inject(HttpClient);
   private readonly userService = inject(UserService);
-  private readonly apiUrl = 'http://localhost:8080/tasks';
+  private readonly apiUrl = 'http://localhost:8080/api/tasks';
   
   private readonly tasksSignal = signal<Task[]>([]);
   private usersMap = new Map<number, string>();

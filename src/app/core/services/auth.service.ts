@@ -98,11 +98,9 @@ export class AuthService {
         const token = this.getToken();
         if (!token) return false;
 
-        // Skip expiry check if it's our dummy session token
         if (token === 'session-active') return true;
 
-        // Check if token is expired (basic check)
-        const payload = this.decodeToken(token);
+         const payload = this.decodeToken(token);
         if (payload && payload.exp) {
             if (Math.floor(Date.now() / 1000) >= payload.exp) {
                 this.logout();

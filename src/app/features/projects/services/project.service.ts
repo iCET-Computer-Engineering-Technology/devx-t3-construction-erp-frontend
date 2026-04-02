@@ -24,7 +24,7 @@ export class ProjectService {
   private http = inject(HttpClient);
   private userService = inject(UserService);
   private taskService = inject(TaskService);
-  private apiUrl = 'http://localhost:8080/api/projects';
+  private apiUrl = '/projects';
   private searchApiUrl = `${this.apiUrl}/search`;
 
   private readonly projectsSignal = signal<Project[]>([]);
@@ -70,25 +70,37 @@ export class ProjectService {
   } 
 
   searchProjects(params: ProjectSearchParams): Observable<Project[]> {
-    let httpParams = new HttpParams();
-    if (params.keyword && params.keyword.trim()) {
-      httpParams = httpParams.set('keyword', params.keyword.trim());
-    }
-    if (params.status && params.status !== 'all') {
-      httpParams = httpParams.set('status', params.status);
-    }
-    if (params.projectManagerId != null && params.projectManagerId > 0) {
-      httpParams = httpParams.set('projectManagerId', params.projectManagerId.toString());
-    }
+    return new Observable<Project[]>(observer => {
+      let filtered = [...this.projectsSignal()];
+      
+      if (params.keyword && params.keyword.trim()) {
+        const kw = params.keyword.trim().toLowerCase();
+        filtered = filtered.filter(p => 
+          p.name.toLowerCase().includes(kw) || 
+          p.location.toLowerCase().includes(kw)
+        );
+      }
+      
+      if (params.status && params.status !== 'all') {
+        filtered = filtered.filter(p => p.status === params.status);
+      }
+      
+      if (params.projectManagerId != null && params.projectManagerId > 0) {
+        filtered = filtered.filter(p => Number(p.managerId) === Number(params.projectManagerId));
+      }
 
-    return this.http
-      .get<{ success: boolean; data: ProjectSearchResult[] }>(this.searchApiUrl, { params: httpParams })
-      .pipe(
-        map(res => {
-          if (!res.success) return [];
-          return res.data.map(sr => this.mapSearchResult(sr));
-        })
-      );
+      // Add the progress calculation that the computed `projects` signal does
+      const tasks = this.taskService.tasks();
+      const result = filtered.map(p => {
+        const projectTasks = tasks.filter(t => String(t.projectId) === String(p.id));
+        const doneTasks = projectTasks.filter(t => t.status === 'DONE').length;
+        const progress = projectTasks.length > 0 ? Math.round((doneTasks / projectTasks.length) * 100) : 0;
+        return { ...p, progress };
+      });
+      
+      observer.next(result);
+      observer.complete();
+    });
   }
  
   private mapRawProject(p: any): Project {
@@ -166,8 +178,8 @@ export class ProjectService {
       project_manager_id: Number(data.managerId) || 1,
       total_budget: parseFloat((data.budgetTotal || '0').replace(/[^0-9.-]+/g, ''))
     };
-    // Backend @PostMapping has no path → POST /api/projects
-    this.http.post<boolean>(this.apiUrl, payload).subscribe({
+    // Backend @PostMapping is mapped to /addProject
+    this.http.post<boolean>(`${this.apiUrl}/addProject`, payload).subscribe({
       next: (success) => { if (success) this.refreshProjects(); },
       error: (err) => console.error('Failed to add project', err)
     });

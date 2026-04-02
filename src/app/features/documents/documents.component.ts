@@ -20,7 +20,7 @@ export class DocumentsComponent implements OnInit {
   private projectService = inject(ProjectService);
   private dialog = inject(MatDialog);
 
-  readonly placeholderImage = 'file:///C:/Users/94778/.gemini/antigravity/brain/3f675778-7257-44e8-858b-f81254d14684/document_preview_placeholder_1774460332504.png';
+  readonly placeholderImage = '';
 
   readonly tabs: DocumentTab[] = ['Contracts', 'Site Photos', 'Blueprints', 'Safety Logs'];
   readonly activeTab = signal<DocumentTab>('Blueprints');
@@ -89,17 +89,78 @@ export class DocumentsComponent implements OnInit {
       }
     });
   }
+  // ── Custom Delete Confirmation ──
+  readonly showDeleteConfirm = signal(false);
+  readonly fileToDelete = signal<DocumentFile | null>(null);
 
-  deleteFile(file: DocumentFile): void {
-    if (confirm(`Are you sure you want to delete ${file.fileName}?`)) {
-      this.documentService.deleteDocument(file.projectId, file.documentId).subscribe({
-        next: () => {
-          if (this.selectedFile()?.documentId === file.documentId) {
-            this.selectedFile.set(null);
-          }
+  // ── Toast Notification ──
+  readonly toastMessage = signal('');
+  readonly toastVisible = signal(false);
+  private toastTimeout: any;
+
+  requestDeleteFile(file: DocumentFile): void {
+    this.fileToDelete.set(file);
+    this.showDeleteConfirm.set(true);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm.set(false);
+    this.fileToDelete.set(null);
+  }
+
+  confirmDelete(): void {
+    const file = this.fileToDelete();
+    if (!file) return;
+    this.showDeleteConfirm.set(false);
+    this.fileToDelete.set(null);
+
+    this.documentService.deleteDocument(file.projectId, file.documentId).subscribe({
+      next: () => {
+        if (this.selectedFile()?.documentId === file.documentId) {
+          this.selectedFile.set(null);
         }
+        this.showToast(`"${file.fileName}" has been removed.`);
+      },
+      error: () => {
+        this.showToast('Failed to delete document. Please try again.');
+      }
+    });
+  }
+
+  // ── Download ──
+  downloadFile(file: DocumentFile): void {
+    const url = `/api/projects/${file.projectId}/documents/${file.documentId}/download`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.fileName;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    this.showToast(`Downloading "${file.fileName}"…`);
+  }
+
+  // ── Share ──
+  shareFile(file: DocumentFile): void {
+    const projectName = this.getProjectName(file.projectId);
+    const info = `📄 ${file.fileName}\n📂 Project: ${projectName}\n📦 Size: ${this.formatSize(file.fileSize)}\n📅 Uploaded: ${file.uploadedAt}\n🔖 Version: ${file.version || 'v1.0'}`;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(info).then(() => {
+        this.showToast('Document details copied to clipboard!');
       });
+    } else {
+      this.showToast('Clipboard not available in this browser.');
     }
+  }
+
+  private showToast(message: string): void {
+    clearTimeout(this.toastTimeout);
+    this.toastMessage.set(message);
+    this.toastVisible.set(true);
+    this.toastTimeout = setTimeout(() => {
+      this.toastVisible.set(false);
+    }, 3000);
   }
 
   getFileIcon(type: string): string {
@@ -126,5 +187,50 @@ export class DocumentsComponent implements OnInit {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  getFileExtension(fileName: string): string {
+    if (!fileName) return 'FILE';
+    const ext = fileName.split('.').pop()?.toUpperCase() || '';
+    return ext || 'FILE';
+  }
+
+  getDocumentStatus(doc: DocumentFile): string {
+    if (!doc.uploadedAt) return 'Pending';
+    return 'Uploaded';
+  }
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'Uploaded': return 'text-green-600';
+      case 'Pending': return 'text-orange-600';
+      default: return 'text-gray-600';
+    }
+  }
+
+  getPreviewIcon(fileType: string): string {
+    if (!fileType) return 'insert_drive_file';
+    const t = fileType.toLowerCase();
+    if (t.includes('pdf')) return 'picture_as_pdf';
+    if (t.includes('image') || t.includes('jpg') || t.includes('png')) return 'image';
+    if (t.includes('spreadsheet') || t.includes('xlsx') || t.includes('csv')) return 'table_chart';
+    if (t.includes('word') || t.includes('doc')) return 'article';
+    if (t.includes('zip') || t.includes('rar')) return 'folder_zip';
+    return 'description';
+  }
+
+  getPreviewIconColor(fileType: string): string {
+    if (!fileType) return '#94a3b8';
+    const t = fileType.toLowerCase();
+    if (t.includes('pdf')) return '#dc2626';
+    if (t.includes('image') || t.includes('jpg') || t.includes('png')) return '#ea580c';
+    if (t.includes('spreadsheet') || t.includes('xlsx') || t.includes('csv')) return '#16a34a';
+    if (t.includes('word') || t.includes('doc')) return '#3b82f6';
+    return '#64748b';
+  }
+
+  getProjectName(projectId: number): string {
+    const proj = this.projects().find(p => p.id === projectId);
+    return proj?.name || 'PRJ-' + projectId;
   }
 }

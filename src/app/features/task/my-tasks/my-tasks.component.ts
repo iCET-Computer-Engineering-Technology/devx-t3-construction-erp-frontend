@@ -60,6 +60,26 @@ export class MyTasksComponent implements OnInit {
     });
   }
 
+  changeStatus(task: Task, newStatus: 'TODO' | 'IN_PROGRESS' | 'DONE') {
+    this.taskService.updateTaskStatus(task.taskId, newStatus).subscribe({
+      next: () => {
+        // Update the local task list immediately for responsive UI
+        const updated = this.tasks().map(t =>
+          t.taskId === task.taskId ? { ...t, status: newStatus } : t
+        );
+        this.tasks.set(updated as Task[]);
+      },
+      error: (err) => {
+        console.error('Failed to update task status', err);
+        // Fallback: update locally anyway for demo
+        const updated = this.tasks().map(t =>
+          t.taskId === task.taskId ? { ...t, status: newStatus } : t
+        );
+        this.tasks.set(updated as Task[]);
+      }
+    });
+  }
+
   formatDate(dateStr: string): string {
     if (!dateStr) return 'No Date';
     const date = new Date(dateStr);

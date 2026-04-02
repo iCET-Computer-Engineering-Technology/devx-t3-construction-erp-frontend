@@ -3,7 +3,7 @@
     <div class="header-left">
       <p class="project-subtitle">ACTIVE PROJECT</p>
       <div class="project-title-wrapper">
-        <h1 class="project-title">{{ projectName || 'Skyview Tower Phase II' }}</h1>
+        <h1 class="project-title">{{ projectName }}</h1>
         <span class="dropdown-icon"><mat-icon>keyboard_arrow_down</mat-icon></span>
       </div>
     </div>
@@ -35,8 +35,8 @@
       </div>
       <div class="card-body">
         <p class="metric-label">Schedule Status</p>
-        <h2 class="metric-value">Delayed</h2>
-        <p class="metric-subtext text-orange font-medium">4 Days behind</p>
+        <h2 class="metric-value">{{ scheduleStatus }}</h2>
+        <p class="metric-subtext text-orange font-medium">{{ daysBehind > 0 ? daysBehind + ' Days behind' : 'On schedule' }}</p>
       </div>
     </div>
 
@@ -46,7 +46,7 @@
       </div>
       <div class="card-body">
         <p class="metric-label">Upcoming Milestones</p>
-        <h2 class="metric-value">12</h2>
+        <h2 class="metric-value">{{ upcomingMilestonesCount }}</h2>
         <p class="metric-subtext">Next 30 days</p>
       </div>
     </div>
@@ -57,7 +57,7 @@
       </div>
       <div class="card-body">
         <p class="metric-label">Critical Path Tasks</p>
-        <h2 class="metric-value text-red">5</h2>
+        <h2 class="metric-value text-red">{{ criticalPathTasksCount }}</h2>
         <p class="metric-subtext">High priority alerts</p>
       </div>
     </div>

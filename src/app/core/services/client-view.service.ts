@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -6,9 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ClientViewService {
-  private baseUrl = 'http://localhost:8080/api/client_access'; 
-
-  constructor(private http: HttpClient) { }
+  private readonly baseUrl = '/client_access';
+  private readonly http = inject(HttpClient);
 
   getProjectDetails(projectId: number, token: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/project-details/${projectId}`, {

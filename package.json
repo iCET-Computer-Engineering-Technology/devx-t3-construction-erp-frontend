@@ -49,5 +49,8 @@
     "tailwindcss": "^4.2.2",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
+  },
+  "overrides": {
+    "undici": "^7.23.0"
   }
 }

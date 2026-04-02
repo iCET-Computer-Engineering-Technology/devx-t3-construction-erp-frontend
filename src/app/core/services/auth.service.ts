@@ -53,8 +53,12 @@ export class AuthService {
  
                 if (response?.token) { 
                     this.setToken(response.token); 
-                    const role = response.role as UserRole; 
+                    let role = response.role as UserRole; 
                     
+                    if (!role) {
+                        role = this.getRoleFromToken(response.token) as UserRole;
+                    }
+
                     if (role) {
                         localStorage.setItem(this.roleKey, role);
                     } else {
@@ -161,10 +165,10 @@ export class AuthService {
         // TEMPORARY FIX: If the backend's JWT doesn't include a role (e.g. only contains 'sub'), default to ADMIN so you can log in.
         console.log("Role eka : ",role);
         
-        // if (!role && decoded.sub) {
-        //     console.warn('No role found in JWT! Defaulting to ADMIN based on sub.');
-        //     role = UserRole.ADMIN;
-        // }
+        if (!role && decoded.sub) {
+            console.warn('No role found in JWT! Defaulting to ADMIN based on sub.');
+            role = UserRole.ADMIN;
+        }
 
         return role ? role as UserRole : null;
     }

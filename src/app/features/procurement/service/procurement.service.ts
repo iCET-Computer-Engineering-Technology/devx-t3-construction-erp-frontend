@@ -17,7 +17,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ProcurementService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api';
+  private readonly apiUrl = 'http://localhost:8080/api/procurement';
 
   // --- Suppliers ---
   getSuppliers(): Observable<Supplier[]> {

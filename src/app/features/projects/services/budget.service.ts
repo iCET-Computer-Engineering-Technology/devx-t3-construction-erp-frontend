@@ -26,8 +26,8 @@ export interface Expense {
   amount?: number;
   expense_type?: string;
   reference_id?: string;
-  date_incurred?: Date;
-  created_at?: Date;
+  date_incurred?: Date | string;
+  created_at?: Date | string;
 }
 
 @Injectable({

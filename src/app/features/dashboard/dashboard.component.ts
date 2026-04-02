@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ProjectService } from '../projects/services/project.service';
 import { TaskService } from '../task/service/task.service';
 import { ProcurementService } from '../procurement/service/procurement.service';
+import { ClientViewService } from '../../core/services/client-view.service';
 
 interface Activity {
   user: string;

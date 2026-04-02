@@ -1,11 +1,12 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
-import { ProjectService } from '../../projects/services/project.service'; // ✅ path check කරන්න
+import { ProjectService } from '../../projects/services/project.service';
+import { TaskService } from '../../task/service/task.service';
 
 interface Task {
   taskId: number;
@@ -42,25 +43,25 @@ interface ProjectMember {
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule]
 })
-export class ProjectProgressComponent implements OnInit {
+export class ProjectProgressComponent implements OnInit, OnChanges {
 
-  @Input() projectId: number = 1; // ✅ parent component එකෙන් pass කරන්න
+  @Input() projectId: number = 1;
 
-  // --- DASHBOARD VARIABLES ---
-  projectName: string = 'Skyview Tower Phase II';
+  // --- DASHBOARD VARIABLES (computed from real data) ---
+  projectName: string = '';
   progressPercentage: number = 0;
-  scheduleStatus: string = 'Delayed';
-  daysBehind: number = 4;
-  upcomingMilestonesCount: number = 12;
-  criticalPathTasksCount: number = 5;
+  scheduleStatus: string = 'On Track';
+  daysBehind: number = 0;
+  upcomingMilestonesCount: number = 0;
+  criticalPathTasksCount: number = 0;
   totalTasks: number = 0;
   completedTasks: number = 0;
   pendingTasks: number = 0;
 
   // --- CHART VARIABLES ---
-  projectStartDate = new Date('2026-01-01');
-  projectEndDate = new Date('2026-05-31');
-  currentDate = new Date('2026-05-31');
+  projectStartDate = new Date();
+  projectEndDate = new Date();
+  currentDate = new Date();
   chartWidthPercentage: number = 0;
   chartHeightPercentage: number = 0;
   chartMonths: string[] = [];
@@ -82,35 +83,95 @@ export class ProjectProgressComponent implements OnInit {
   selectedRoleLabel: string = '';
   editingMember: ProjectMember | null = null;
   editRoleLabel: string = '';
-  currentUserId: number = 1; // ✅ AuthService එකෙන් ගන්න ඕනෙ නම් කියන්න
+  currentUserId: number = 1;
 
-  // --- DUMMY DATA ---
-  tasks: Task[] = [
-    { taskId: 1, projectId: 1, phaseId: 1, assignedUserId: 2, workerName: 'Alex Johnson', title: 'Foundation Works', description: 'Pouring concrete', startDate: '2026-03-01', dueDate: '2026-03-10', status: 'DONE' },
-    { taskId: 2, projectId: 1, phaseId: 1, assignedUserId: 2, workerName: 'Alex Johnson', title: 'Site Clearing', description: null, startDate: '2026-03-11', dueDate: '2026-03-15', status: 'DONE' },
-    { taskId: 3, projectId: 1, phaseId: 2, assignedUserId: 3, workerName: 'Maria Garcia', title: 'Sub-surface Excavation', description: null, startDate: '2026-03-16', dueDate: '2026-03-20', status: 'DONE' },
-    { taskId: 4, projectId: 1, phaseId: 3, assignedUserId: 4, workerName: 'David Smith', title: 'Superstructure (L1-L24)', description: null, startDate: '2026-03-21', dueDate: '2026-05-01', status: 'IN_PROGRESS' },
-    { taskId: 5, projectId: 1, phaseId: 4, assignedUserId: 5, workerName: 'Sarah Lee', title: 'MEP Installations', description: null, startDate: '2026-05-02', dueDate: '2026-06-01', status: 'TODO' },
-    { taskId: 6, projectId: 1, phaseId: 5, assignedUserId: 6, workerName: 'James Wilson', title: 'Interior Finishing', description: null, startDate: '2026-06-02', dueDate: '2026-07-01', status: 'TODO' },
-  ];
-
-  milestones: Milestone[] = [
-    { id: 1, name: 'Foundation Approval', plannedDate: '2026-03-15', forecastDate: '2026-03-15', status: 'Completed' },
-    { id: 2, name: 'Level 10 Reached', plannedDate: '2026-04-10', forecastDate: '2026-04-14', status: 'Delayed' },
-    { id: 3, name: 'HVAC Rough-in', plannedDate: '2026-05-15', forecastDate: '2026-05-15', status: 'On Track' },
-    { id: 4, name: 'Facade Completion', plannedDate: '2026-07-01', forecastDate: '2026-07-05', status: 'On Track' }
-  ];
+  // --- REAL DATA ---
+  tasks: Task[] = [];
+  milestones: Milestone[] = [];
 
   constructor(
     private projectService: ProjectService,
-    private userService: UserService
+    private userService: UserService,
+    private taskService: TaskService
   ) {}
 
   ngOnInit(): void {
-    this.calculateProgress();
-    this.calculateChartData();
+    this.loadProjectData();
     this.loadMembers();
     this.loadAllUsers();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['projectId'] && !changes['projectId'].firstChange) {
+      this.loadProjectData();
+      this.loadMembers();
+    }
+  }
+
+  private loadProjectData(): void {
+    // Get project name from projects signal
+    const projects = this.projectService.projects();
+    const project = projects.find(p => p.id === this.projectId);
+    this.projectName = project?.name || 'Project #' + this.projectId;
+
+    // Derive dates from project if available
+    if (project) {
+      const rawStart = (project as any).startDate;
+      const rawEnd = (project as any).endDate || (project as any).estimatedCompletion;
+      if (rawStart) this.projectStartDate = new Date(rawStart);
+      if (rawEnd) this.projectEndDate = new Date(rawEnd);
+    }
+
+    // Load tasks from the TaskService signal, filtered by projectId
+    const allTasks = this.taskService.tasks();
+    this.tasks = allTasks
+      .filter(t => String(t.projectId) === String(this.projectId))
+      .map(t => ({
+        taskId: t.taskId,
+        projectId: t.projectId,
+        phaseId: null,
+        assignedUserId: t.assigneeUserId || null,
+        workerName: t.assigneeUserName || 'Unassigned',
+        title: t.title,
+        description: t.description || null,
+        startDate: t.startDate || null,
+        dueDate: t.endDate || null,
+        status: t.status as 'TODO' | 'IN_PROGRESS' | 'DONE',
+      }));
+
+    this.calculateProgress();
+    this.calculateChartData();
+    this.deriveMilestones();
+  }
+
+  private deriveMilestones(): void {
+    // Derive milestones from completed tasks as real data points
+    this.milestones = [];
+    const doneTasks = this.tasks.filter(t => t.status === 'DONE');
+    const inProgressTasks = this.tasks.filter(t => t.status === 'IN_PROGRESS');
+    const todoTasks = this.tasks.filter(t => t.status === 'TODO');
+
+    doneTasks.forEach((t, i) => {
+      this.milestones.push({
+        id: i + 1,
+        name: t.title + ' — Complete',
+        plannedDate: t.dueDate || '—',
+        forecastDate: t.dueDate || '—',
+        status: 'Completed',
+      });
+    });
+    inProgressTasks.forEach((t, i) => {
+      this.milestones.push({
+        id: doneTasks.length + i + 1,
+        name: t.title,
+        plannedDate: t.dueDate || '—',
+        forecastDate: t.dueDate || '—',
+        status: 'On Track',
+      });
+    });
+
+    this.upcomingMilestonesCount = inProgressTasks.length + todoTasks.length;
+    this.criticalPathTasksCount = inProgressTasks.length;
   }
 
   // =====================

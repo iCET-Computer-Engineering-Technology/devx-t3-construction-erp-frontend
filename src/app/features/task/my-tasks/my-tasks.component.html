@@ -64,8 +64,11 @@
           </div>
           <div class="task-actions" (click)="$event.stopPropagation()">
             @if(task.status !== 'DONE') {
-              <button class="btn btn-outline" [class.btn-outline-orange]="task.status === 'TODO'" [class.btn-dark]="task.status === 'IN_PROGRESS'">
-                {{ task.status === 'TODO' ? 'Start Task' : 'Update Status' }}
+              <button class="btn btn-outline" 
+                      [class.btn-outline-orange]="task.status === 'TODO'" 
+                      [class.btn-dark]="task.status === 'IN_PROGRESS'"
+                      (click)="changeStatus(task, task.status === 'TODO' ? 'IN_PROGRESS' : 'DONE')">
+                {{ task.status === 'TODO' ? 'Start Task' : 'Mark Complete' }}
               </button>
             } @else {
               <button class="btn btn-disabled">Archived</button>

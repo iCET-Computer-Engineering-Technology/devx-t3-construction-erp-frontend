@@ -8,7 +8,7 @@ import { DocumentFile } from '../models/document.model';
 })
 export class DocumentService {
   private http = inject(HttpClient);
-  private apiUrl = '/api/projects';
+  private apiUrl = '/api/documents';
 
   private readonly documentsSignal = signal<DocumentFile[]>([]);
   readonly documents = this.documentsSignal.asReadonly();

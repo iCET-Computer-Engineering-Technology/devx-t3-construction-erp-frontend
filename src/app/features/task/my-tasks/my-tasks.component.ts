@@ -32,13 +32,13 @@ export class MyTasksComponent implements OnInit {
     return this.tasks().filter(t => t.status === tab);
   });
 
-  ngOnInit() {
+  ngOnInit() {    
     this.loadMyTasks();
   }
 
   loadMyTasks() {
     const userId = this.authService.getCurrentUserId();
-    if (userId) {
+    if (true) {
       this.taskService.getMyTasks(Number(userId)).subscribe(tasks => {
         this.tasks.set(tasks);
       });

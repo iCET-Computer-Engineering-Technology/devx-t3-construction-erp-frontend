@@ -24,7 +24,7 @@ export class ProjectService {
   private http = inject(HttpClient);
   private userService = inject(UserService);
   private taskService = inject(TaskService);
-  private apiUrl = '/projects';
+  private apiUrl = '/api/projects';
   private searchApiUrl = `${this.apiUrl}/search`;
 
   private readonly projectsSignal = signal<Project[]>([]);

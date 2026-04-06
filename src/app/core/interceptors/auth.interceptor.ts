@@ -14,7 +14,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         authReq = req.clone({
             setHeaders: {
                 Authorization: `Bearer ${token}`
-            }
+            },
+            withCredentials: true // <--- ADDED THIS
+        });
+    } else if (!req.url.includes('/api/auth/login')) {
+        // Even if there's no JWT, we might need to send cookies for session-based auth
+        authReq = req.clone({
+            withCredentials: true // <--- ADDED THIS
         });
     }
 

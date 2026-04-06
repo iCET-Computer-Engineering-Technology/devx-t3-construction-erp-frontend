@@ -2,7 +2,11 @@
   <router-outlet></router-outlet>
 } @else {
   <div class="app-layout">
-    <app-sidebar [config]="sidebarConfig()" />
+    <app-sidebar 
+      [config]="sidebarConfig()" 
+      [currentUser]="currentUser"
+      (logoutClicked)="logout()"
+    />
     <div class="app-main">
       <app-top-bar [user]="currentUser" />
       <div class="app-content">

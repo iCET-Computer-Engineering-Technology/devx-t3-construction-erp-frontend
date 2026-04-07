@@ -18,6 +18,11 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
+        path: 'projects/:id/report',
+        loadComponent: () => import('./features/projects/project-report/project-report.component').then(c => c.ProjectReportComponent),
+        canActivate: [authGuard]
+    },
+    {
         path: 'projects/:id',
         loadComponent: () => import('./features/projects/project-details/project-details.component').then(c => c.ProjectDetailsComponent),
         canActivate: [authGuard]

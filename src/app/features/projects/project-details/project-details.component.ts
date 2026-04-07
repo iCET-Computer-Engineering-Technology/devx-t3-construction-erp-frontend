@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { ProjectService } from '../services/project.service';
@@ -10,7 +10,7 @@ import { ProjectBudgetComponent } from '../project-budget/project-budget.compone
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatRippleModule, ProjectProgressComponent, ProjectBudgetComponent],
+  imports: [CommonModule, MatIconModule, MatRippleModule, RouterLink, ProjectProgressComponent, ProjectBudgetComponent],
   templateUrl: './project-details.component.html',
   styleUrl: './project-details.component.css'
 })

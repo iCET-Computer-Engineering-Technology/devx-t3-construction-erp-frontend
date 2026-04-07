@@ -1,0 +1,70 @@
+.equipment-container {
+    height: 100vh;
+    font-family: inherit;
+  }
+  
+  .stat-card {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .equipment-table th {
+    position: sticky;
+    top: 0;
+    background: #f9fafb;
+    z-index: 5;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .equipment-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .equipment-table tr {
+    transition: all 0.2s ease;
+  }
+  
+  .equipment-table tr:hover {
+    background-color: #fafafa;
+  }
+  
+  /* Sidebar detail custom scroll */
+  .details-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .details-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .details-sidebar::-webkit-scrollbar-thumb {
+    background-color: #e5e7eb;
+    border-radius: 20px;
+  }
+  
+  /* Details property item */
+  .property-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(243, 244, 246, 0.5);
+  }
+  
+  .property-item:last-child {
+    border-bottom: none;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  

@@ -28,7 +28,7 @@ export class App {
     { label: 'Tasks', icon: 'task_alt', route: '/tasks', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
     { label: 'WBS', icon: 'account_tree', route: '/wbs', roles: ['ADMIN', 'PROJECT_MANAGER'] },
     { label: 'Procurement', icon: 'timeline', route: '/procurement', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
-    { label: 'Equipment', icon: 'construction', route: '/equipmemt', roles: ['ADMIN', 'SITE_ENGINEER'] },
+    { label: 'Equipment', icon: 'construction', route: '/equipment', roles: ['ADMIN', 'SITE_ENGINEER'] },
     { label: 'Workforce', icon: 'groups', route: '/workforce', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
     { label: 'Budget', icon: 'account_balance_wallet', route: '/budget', roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
     { label: 'Documents', icon: 'description', route: '/documents', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },

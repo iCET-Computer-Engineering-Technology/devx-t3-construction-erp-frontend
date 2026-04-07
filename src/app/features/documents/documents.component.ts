@@ -7,6 +7,7 @@ import { DocumentService } from './services/document.service';
 import { ProjectService } from '../projects/services/project.service';
 import { DocumentFile, DocumentTab } from './models/document.model';
 import { DocumentUploadDialogComponent } from './document-upload-dialog.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-documents',
@@ -38,6 +39,8 @@ export class DocumentsComponent implements OnInit {
       this.selectProject(projList[0].id);
     }
   }
+
+  constructor(private http: HttpClient) {}
 
   selectProject(projectId: number): void {
     this.selectedProjectId.set(projectId);
@@ -129,15 +132,23 @@ export class DocumentsComponent implements OnInit {
 
   // ── Download ──
   downloadFile(file: DocumentFile): void {
-    const url = `/api/projects/${file.projectId}/documents/${file.documentId}/download`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.fileName;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    this.showToast(`Downloading "${file.fileName}"…`);
+    const url = `/api/documents/${file.projectId}/documents/${file.documentId}/download`;
+
+  this.http.get(url, { responseType: 'blob' }).subscribe({
+    next: (blob) => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = file.fileName;
+      a.click();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      this.showToast(`Downloading "${file.fileName}"…`);
+    },
+    error: () => {
+      this.showToast('Download failed');
+    }
+  });
   }
 
   // ── Share ──

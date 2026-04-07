@@ -1,56 +1,84 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../services/project.service';
 import { ProjectReport } from '../../../core/models/report.model';
+import { Project } from '../models/project.model';
 
 @Component({
   selector: 'app-project-report',
   standalone: true,
   imports: [
+    CommonModule,
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    FormsModule
   ],
   templateUrl: './project-report.component.html',
   styleUrl: './project-report.component.css'
 })
 export class ProjectReportComponent implements OnInit {
-  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private projectService = inject(ProjectService);
 
+  readonly projects = signal<Project[]>([]);
+  readonly selectedProjectId = signal<number | null>(null);
   readonly report = signal<ProjectReport | null>(null);
-  readonly isLoading = signal(true);
+  readonly isLoading = signal(false);
   readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    
-    if (!idParam) {
-      this.error.set('No project ID provided');
+    this.loadProjects();
+  }
+
+  private loadProjects(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    // Get projects from the service's computed signal
+    const allProjects = this.projectService.projects();
+    if (allProjects.length > 0) {
+      this.projects.set(allProjects);
       this.isLoading.set(false);
+    } else {
+      // If projects haven't loaded yet, trigger a refresh and wait
+      this.projectService.refreshProjects();
+      
+      // Wait a bit for the projects to load
+      setTimeout(() => {
+        this.projects.set(this.projectService.projects());
+        this.isLoading.set(false);
+      }, 1000);
+    }
+  }
+
+  onProjectSelect(event: any): void {
+    const selectedId = Number(event.value);
+    
+    if (!selectedId || isNaN(selectedId)) {
+      this.error.set('Invalid project selection');
       return;
     }
 
-    const id = Number(idParam);
-    
-    if (isNaN(id)) {
-      this.error.set('Invalid project ID');
-      this.isLoading.set(false);
-      return;
-    }
-
-    this.loadReport(id);
+    this.selectedProjectId.set(selectedId);
+    this.loadReport(selectedId);
   }
 
   private loadReport(id: number): void {
     this.isLoading.set(true);
     this.error.set(null);
+    this.report.set(null);
 
     this.projectService.getProjectReport(id).subscribe({
       next: (response) => {
@@ -69,14 +97,12 @@ export class ProjectReportComponent implements OnInit {
     });
   }
 
-  goBack(): void {
-    this.router.navigate(['/projects']);
-  }
-
   retry(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
-      this.loadReport(Number(idParam));
+    const id = this.selectedProjectId();
+    if (id) {
+      this.loadReport(id);
+    } else {
+      this.loadProjects();
     }
   }
 

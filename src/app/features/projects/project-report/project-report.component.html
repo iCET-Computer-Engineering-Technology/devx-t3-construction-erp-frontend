@@ -1,17 +1,29 @@
 <div class="project-report-container">
   <!-- Header -->
   <div class="report-header">
-    <button mat-icon-button (click)="goBack()" class="back-button">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1>Project Report</h1>
+    <h1>Project Reports</h1>
+  </div>
+
+  <!-- Project Selector -->
+  <div class="project-selector">
+    <mat-form-field appearance="outline" class="selector-field">
+      <mat-label>Select a Project</mat-label>
+      <mat-select 
+        [value]="selectedProjectId()" 
+        (selectionChange)="onProjectSelect($event)"
+        [disabled]="isLoading()">
+        <mat-option *ngFor="let project of projects()" [value]="project.id">
+          {{ project.name }} - {{ project.location }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 
   <!-- Loading State -->
   @if (isLoading()) {
     <div class="loading-container">
       <mat-spinner></mat-spinner>
-      <p>Loading report...</p>
+      <p>Loading...</p>
     </div>
   }
 
@@ -25,6 +37,15 @@
         <mat-icon>refresh</mat-icon>
         Retry
       </button>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!selectedProjectId() && !isLoading() && !error()) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">assessment</mat-icon>
+      <h2>Select a Project</h2>
+      <p>Choose a project from the dropdown above to view its detailed report</p>
     </div>
   }
 

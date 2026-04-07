@@ -1,0 +1,140 @@
+<div class="project-report-container">
+  <!-- Header -->
+  <div class="report-header">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Project Report</h1>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading report...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !isLoading()) {
+    <div class="error-container">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <h2>Error Loading Report</h2>
+      <p>{{ error() }}</p>
+      <button mat-raised-button color="primary" (click)="retry()">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- Report Content -->
+  @if (report() && !isLoading() && !error()) {
+    <div class="report-content">
+      <!-- Project Info -->
+      <mat-card class="info-card">
+        <mat-card-header>
+          <mat-card-title>{{ report()!.projectName }}</mat-card-title>
+          <mat-card-subtitle>
+            <span class="status-badge" [class]="'status-' + report()!.status.toLowerCase()">
+              {{ report()!.status }}
+            </span>
+          </mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- Budget Overview -->
+      <div class="metrics-grid">
+        <mat-card class="metric-card">
+          <div class="metric-icon budget-icon">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="metric-content">
+            <h3>Total Budget</h3>
+            <p class="metric-value">{{ formatCurrency(report()!.totalBudget) }}</p>
+          </div>
+        </mat-card>
+
+        <mat-card class="metric-card">
+          <div class="metric-icon expense-icon">
+            <mat-icon>payments</mat-icon>
+          </div>
+          <div class="metric-content">
+            <h3>Total Expenses</h3>
+            <p class="metric-value">{{ formatCurrency(report()!.totalExpenses) }}</p>
+          </div>
+        </mat-card>
+
+        <mat-card class="metric-card" [class]="getBudgetStatusClass()">
+          <div class="metric-icon remaining-icon">
+            <mat-icon>savings</mat-icon>
+          </div>
+          <div class="metric-content">
+            <h3>Remaining Budget</h3>
+            <p class="metric-value">{{ formatCurrency(report()!.remainingBudget) }}</p>
+          </div>
+        </mat-card>
+      </div>
+
+      <!-- Task Progress -->
+      <div class="metrics-grid">
+        <mat-card class="metric-card">
+          <div class="metric-icon task-icon">
+            <mat-icon>assignment</mat-icon>
+          </div>
+          <div class="metric-content">
+            <h3>Total Tasks</h3>
+            <p class="metric-value">{{ report()!.totalTasks }}</p>
+          </div>
+        </mat-card>
+
+        <mat-card class="metric-card">
+          <div class="metric-icon completed-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="metric-content">
+            <h3>Completed Tasks</h3>
+            <p class="metric-value">{{ report()!.completedTasks }}</p>
+          </div>
+        </mat-card>
+
+        <mat-card class="metric-card" [class]="getProgressStatusClass()">
+          <div class="metric-icon progress-icon">
+            <mat-icon>show_chart</mat-icon>
+          </div>
+          <div class="metric-content">
+            <h3>Progress</h3>
+            <p class="metric-value">{{ formatPercentage(report()!.progressPercentage) }}</p>
+          </div>
+        </mat-card>
+      </div>
+
+      <!-- Summary Section -->
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <mat-card-title>Summary</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="summary-label">Budget Utilization:</span>
+              <span class="summary-value">
+                {{ formatPercentage((report()!.totalExpenses / report()!.totalBudget) * 100) }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Pending Tasks:</span>
+              <span class="summary-value">
+                {{ report()!.totalTasks - report()!.completedTasks }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Project ID:</span>
+              <span class="summary-value">{{ report()!.projectId }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</div>

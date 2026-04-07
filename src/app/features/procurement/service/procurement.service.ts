@@ -18,14 +18,15 @@ import {
 export class ProcurementService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = '/api/procurement';
+  private readonly supplierApiUrl = '/api/suppliers';
 
   // --- Suppliers ---
   getSuppliers(): Observable<Supplier[]> {
-    return this.http.get<Supplier[]>(`${this.apiUrl}/suppliers`);
+    return this.http.get<Supplier[]>(`${this.supplierApiUrl}`);
   }
 
   createSupplier(supplier: Supplier): Observable<Supplier> {
-    return this.http.post<Supplier>(`${this.apiUrl}/suppliers`, supplier);
+    return this.http.post<Supplier>(`${this.supplierApiUrl}`, supplier);
   }
 
   // --- Material Requisitions ---

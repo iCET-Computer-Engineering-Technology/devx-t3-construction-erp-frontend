@@ -15,18 +15,24 @@ export class DocumentService {
 
   getDocuments(projectId: number): Observable<DocumentFile[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${projectId}/documents`).pipe(
-      map(rawDocs => (rawDocs || []).map(d => ({
-        documentId: d.documentId || d.document_id || d.id,
-        projectId: d.projectId || d.project_id || projectId,
-        fileName: d.fileName || d.file_name || d.name || 'Untitled Document',
-        fileSize: d.fileSize || d.file_size || d.size || 0,
-        fileType: d.fileType || d.file_type || d.type || 'application/octet-stream',
-        uploadedAt: d.uploadedAt || d.uploaded_at || d.created_at || new Date().toISOString(),
-        uploadedBy: d.uploadedBy || d.uploaded_by || d.user_id || 0,
-        uploaderName: d.uploaderName || d.uploader_name || d.user_name,
-        uploaderAvatar: d.uploaderAvatar || d.uploader_avatar,
-        version: d.version || 'v1.0'
-      } as DocumentFile))),
+      map(rawDocs => (rawDocs || []).map(d => {
+        // Sanitize documentId: if it's "2:1", parse to 2.
+        const rawId = d.documentId || d.document_id || d.id;
+        const sanitizedId = typeof rawId === 'string' ? parseInt(rawId.split(':')[0], 10) : Number(rawId);
+
+        return {
+          documentId: sanitizedId,
+          projectId: d.projectId || d.project_id || projectId,
+          fileName: d.fileName || d.file_name || d.name || 'Untitled Document',
+          fileSize: d.fileSize || d.file_size || d.size || 0,
+          fileType: d.fileType || d.file_type || d.type || 'application/octet-stream',
+          uploadedAt: d.uploadedAt || d.uploaded_at || d.created_at || new Date().toISOString(),
+          uploadedBy: d.uploadedBy || d.uploaded_by || d.user_id || 0,
+          uploaderName: d.uploaderName || d.uploader_name || d.user_name,
+          uploaderAvatar: d.uploaderAvatar || d.uploader_avatar,
+          version: d.version || 'v1.0'
+        } as DocumentFile;
+      })),
       tap(docs => this.documentsSignal.set(docs))
     );
   }

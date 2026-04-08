@@ -30,17 +30,35 @@ interface TaskApiResponse {
   priority?: string;
 }
 
+import { UserService } from '../../../core/services/user.service';
+
 @Injectable({ providedIn: 'root' })
 export class TaskService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/tasks';
+  private readonly userService = inject(UserService);
+  private readonly apiUrl = '/tasks';
+  
   private readonly tasksSignal = signal<Task[]>([]);
+  private usersMap = new Map<number, string>();
 
   readonly tasks = this.tasksSignal.asReadonly();
   readonly count = computed(() => this.tasksSignal().length);
 
   constructor() {
-    this.refreshTasks();
+    this.loadUsersAndTasks();
+  }
+
+  private loadUsersAndTasks(): void {
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        (users || []).forEach((u: any) => this.usersMap.set(Number(u.userId), u.name));
+        this.refreshTasks();
+      },
+      error: (err) => {
+        console.error('Failed to load users for tasks', err);
+        this.refreshTasks();
+      }
+    });
   }
 
   refreshTasks(): void {
@@ -60,6 +78,12 @@ export class TaskService {
     const body = this.mapToApi(payload);
 
     return this.http.post<unknown>(this.apiUrl, body).pipe(tap(() => this.refreshTasks()));
+  }
+
+  updateTaskStatus(taskId: number, newStatus: Task['status']) {
+    return this.http.patch<unknown>(`${this.apiUrl}/${taskId}`, { status: newStatus }).pipe(
+      tap(() => this.refreshTasks())
+    );
   }
 
   getTaskById(id: number): Observable<Task | null> {
@@ -107,10 +131,13 @@ export class TaskService {
     const status = (item.status ?? 'TODO').toUpperCase();
     const priority = (item.priority ?? 'MEDIUM').toUpperCase();
 
+    const assigneeId = Number(item.assigneeUserId ?? item.assigned_user_id ?? 0);
+    const resolvedAssigneeName = item.assigned_user_name ?? item.assignedUserName ?? this.usersMap.get(assigneeId);
+
     return {
       taskId: Number(item.id ?? item.task_id ?? item.taskId ?? 0),
       projectId: Number(item.project_id ?? item.projectId ?? 0),
-      assigneeUserId: Number(item.assigneeUserId ?? item.assigned_user_id ?? 0),
+      assigneeUserId: assigneeId,
       title: item.title ?? item.task_title ?? 'Untitled Task',
       description: item.description ?? '',
       priority: this.normalizePriority(priority),
@@ -118,7 +145,7 @@ export class TaskService {
       endDate: this.toIsoDate(item.end_date ?? item.endDate ?? item.due_date ?? item.dueDate),
       status: this.normalizeStatus(status),
       projectName: item.project_name ?? item.projectName,
-      assigneeUserName: item.assigned_user_name ?? item.assignedUserName,
+      assigneeUserName: resolvedAssigneeName,
     };
   }
 

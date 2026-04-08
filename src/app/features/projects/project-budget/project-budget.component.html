@@ -1,0 +1,106 @@
+<div class="budget-dashboard">
+  <div class="dashboard-header">
+    <h3 class="dashboard-title">
+      <mat-icon class="title-icon">account_balance_wallet</mat-icon>
+      Financial Overview
+    </h3>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <mat-icon class="spin-icon">sync</mat-icon>
+      <span>Loading budget data...</span>
+    </div>
+  } @else {
+    @if (!budget()) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">request_quote</mat-icon>
+        <p>No budget allocated for this project yet.</p>
+        <button class="create-budget-btn" matRipple (click)="createBudget()">
+          Initialize Budget
+        </button>
+      </div>
+    } @else {
+      <!-- Summary Cards -->
+      <div class="budget-summary-cards">
+        <div class="summary-card est-card">
+          <div class="card-icon"><mat-icon>account_balance</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Total Estimated</span>
+            <span class="card-value">{{ budget()?.total_estimated_amount || 0 | currency }}</span>
+          </div>
+        </div>
+        <div class="summary-card comm-card">
+          <div class="card-icon"><mat-icon>assignment</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Committed Costs</span>
+            <span class="card-value">{{ getTotalCommitted() | currency }}</span>
+          </div>
+        </div>
+        <div class="summary-card act-card">
+          <div class="card-icon"><mat-icon>payments</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Actual Costs</span>
+            <span class="card-value">{{ getTotalActual() | currency }}</span>
+          </div>
+        </div>
+        <div class="summary-card var-card" [class.negative-variance]="getTotalVariance() < 0">
+          <div class="card-icon"><mat-icon>trending_flat</mat-icon></div>
+          <div class="card-content">
+            <span class="card-label">Variance</span>
+            <span class="card-value">{{ getTotalVariance() | currency }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="action-bar">
+        <h4>Cost Codes Breakdown</h4>
+        <button class="add-item-btn" matRipple (click)="addExampleBudgetItem()">
+          <mat-icon>add</mat-icon> New Cost Code
+        </button>
+      </div>
+
+      <!-- Detail Table -->
+      <div class="table-container">
+        <table class="budget-table">
+          <thead>
+            <tr>
+              <th>Cost Code</th>
+              <th>Description</th>
+              <th class="money-col">Estimated</th>
+              <th class="money-col">Committed</th>
+              <th class="money-col">Actual</th>
+              <th class="money-col">Variance</th>
+              <th class="action-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of budgetItems(); track item.id) {
+              <tr>
+                <td class="code-cell"><span class="code-badge">{{ item.cost_code }}</span></td>
+                <td>{{ item.description }}</td>
+                <td class="money-cell">{{ item.estimated_amount | currency }}</td>
+                <td class="money-cell">{{ item.committed_amount | currency }}</td>
+                <td class="money-cell">{{ item.actual_amount | currency }}</td>
+                <td class="money-cell" [class.negative-text]="getVariance(item) < 0">
+                  {{ getVariance(item) | currency }}
+                </td>
+                <td class="action-cell">
+                  <button class="log-expense-btn" title="Log Expense" (click)="logExampleExpense(item)">
+                    <mat-icon>receipt_long</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (budgetItems().length === 0) {
+              <tr>
+                <td colspan="7" class="empty-table-row">No cost codes defined. Add one to start tracking.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

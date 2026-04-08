@@ -1,0 +1,395 @@
+<div class="budget-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1 class="page-title">Budget Management</h1>
+      <p class="page-subtitle">Track project finances, cost codes, and expense allocations in real-time.</p>
+    </div>
+    <div class="header-actions">
+      <div class="project-selector">
+        <mat-icon class="selector-icon">folder_open</mat-icon>
+        <select class="project-select" [value]="selectedProjectId()" (change)="selectProject(+$any($event.target).value)">
+          @for (project of projects(); track project.id) {
+            <option [value]="project.id">{{ project.name }}</option>
+          }
+        </select>
+      </div>
+      @if (!budget()) {
+        <button class="btn-primary" matRipple (click)="openCreateBudget()">
+          <mat-icon class="btn-icon">add</mat-icon>
+          Create Budget
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <span class="loading-text">Loading budget data…</span>
+    </div>
+  }
+
+  <!-- No Budget State -->
+  @if (!isLoading() && !budget()) {
+    <div class="empty-state-card">
+      <mat-icon class="empty-icon">account_balance_wallet</mat-icon>
+      <h3>No Budget Created</h3>
+      <p>This project doesn't have a budget yet. Create one to start tracking finances.</p>
+      <button class="btn-primary" matRipple (click)="openCreateBudget()">
+        <mat-icon class="btn-icon">add</mat-icon>
+        Create Budget
+      </button>
+    </div>
+  }
+
+  <!-- Budget Content -->
+  @if (!isLoading() && budget()) {
+    <!-- Summary Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-content">
+          <p class="stat-title">TOTAL BUDGET</p>
+          <h2 class="stat-value">{{ formatCurrency(budget()?.total_estimated_amount) }}</h2>
+          <p class="stat-subtitle">Approved estimate</p>
+        </div>
+        <div class="stat-icon-wrap bg-blue">
+          <mat-icon>account_balance</mat-icon>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-content">
+          <p class="stat-title">TOTAL SPENT</p>
+          <h2 class="stat-value">{{ formatCurrency(totalActual()) }}</h2>
+          <p class="stat-subtitle stat-trend" [class.trend-up]="utilization() <= 80" [class.trend-down]="utilization() > 80">
+            {{ utilization() }}% utilized
+          </p>
+        </div>
+        <div class="stat-icon-wrap bg-orange">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-content">
+          <p class="stat-title">REMAINING</p>
+          <h2 class="stat-value" [class.text-red]="remaining() < 0">{{ formatCurrency(remaining()) }}</h2>
+          <p class="stat-subtitle">Available funds</p>
+        </div>
+        <div class="stat-icon-wrap" [class.bg-green]="remaining() >= 0" [class.bg-red]="remaining() < 0">
+          <mat-icon>{{ remaining() >= 0 ? 'savings' : 'warning' }}</mat-icon>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-content">
+          <p class="stat-title">COMMITTED</p>
+          <h2 class="stat-value">{{ formatCurrency(totalCommitted()) }}</h2>
+          <p class="stat-subtitle">Locked in contracts</p>
+        </div>
+        <div class="stat-icon-wrap bg-purple">
+          <mat-icon>handshake</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget Health Bar -->
+    <div class="health-bar-card">
+      <div class="health-header">
+        <span class="health-label">Budget Utilization</span>
+        <span class="health-pct" [class]="'health-' + budgetHealth()">{{ utilization() }}%</span>
+      </div>
+      <div class="health-track">
+        <div class="health-fill" [class]="'health-' + budgetHealth()" [style.width.%]="utilization()"></div>
+      </div>
+      <div class="health-legend">
+        <span class="legend-item"><span class="legend-dot bg-green"></span> Healthy (&lt;70%)</span>
+        <span class="legend-item"><span class="legend-dot bg-amber"></span> Warning (70-90%)</span>
+        <span class="legend-item"><span class="legend-dot bg-red"></span> Critical (&gt;90%)</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button class="tab" [class.active]="activeTab() === 'overview'" (click)="setTab('overview')">Overview</button>
+      <button class="tab" [class.active]="activeTab() === 'items'" (click)="setTab('items')">Budget Items</button>
+      <button class="tab" [class.active]="activeTab() === 'expenses'" (click)="setTab('expenses')">Expense Log</button>
+    </div>
+
+    <!-- Overview Tab -->
+    @if (activeTab() === 'overview' || activeTab() === 'items') {
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">Cost Breakdown</h3>
+          <button class="btn-primary btn-sm" matRipple (click)="openAddItem()">
+            <mat-icon class="btn-icon">add</mat-icon>
+            Add Item
+          </button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="th-first">COST CODE</th>
+              <th>DESCRIPTION</th>
+              <th>ESTIMATED</th>
+              <th>COMMITTED</th>
+              <th>ACTUAL</th>
+              <th>VARIANCE</th>
+              <th>UTILIZATION</th>
+              <th class="th-actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of budgetItems(); track item.id) {
+              <tr class="data-row" [class.selected]="selectedItem()?.id === item.id" (click)="selectBudgetItem(item)">
+                <td class="td-first">
+                  <div class="code-cell">
+                    <div class="code-icon-wrap">
+                      <mat-icon>{{ getCostCodeIcon(item.cost_code || '') }}</mat-icon>
+                    </div>
+                    <span class="code-text">{{ item.cost_code }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="desc-text">{{ item.description || '—' }}</span>
+                </td>
+                <td><span class="amount">{{ formatCurrency(item.estimated_amount) }}</span></td>
+                <td><span class="amount">{{ formatCurrency(item.committed_amount) }}</span></td>
+                <td><span class="amount amount-actual">{{ formatCurrency(item.actual_amount) }}</span></td>
+                <td>
+                  <span class="variance" [class.positive]="(item.estimated_amount || 0) >= (item.actual_amount || 0)" [class.negative]="(item.estimated_amount || 0) < (item.actual_amount || 0)">
+                    {{ formatCurrency((item.estimated_amount || 0) - (item.actual_amount || 0)) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="util-cell">
+                    <div class="util-track">
+                      <div class="util-fill" [class]="getUtilizationClass(getItemUtilization(item))" [style.width.%]="getItemUtilization(item)"></div>
+                    </div>
+                    <span class="util-pct" [class]="getUtilizationClass(getItemUtilization(item))">{{ getItemUtilization(item) }}%</span>
+                  </div>
+                </td>
+                <td class="td-actions" (click)="$event.stopPropagation()">
+                  <button class="action-btn" matRipple (click)="openLogExpense(item)" title="Log Expense">
+                    <mat-icon>add_card</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+
+            @if (budgetItems().length === 0) {
+              <tr>
+                <td colspan="8" class="empty-row">
+                  <mat-icon class="empty-row-icon">receipt_long</mat-icon>
+                  <p>No budget items yet. Click "Add Item" to create cost codes.</p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="table-footer">
+          <span class="footer-text">{{ budgetItems().length }} cost code{{ budgetItems().length !== 1 ? 's' : '' }}</span>
+          <span class="footer-total">Total: {{ formatCurrency(totalEstimated()) }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Expenses Tab -->
+    @if (activeTab() === 'expenses') {
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">All Expenses</h3>
+        </div>
+        @if (budgetItems().length === 0) {
+          <div class="empty-row" style="padding: 48px 24px; text-align: center;">
+            <mat-icon class="empty-row-icon">receipt_long</mat-icon>
+            <p>Add budget items first, then log expenses against them.</p>
+          </div>
+        } @else {
+          <div class="expense-list">
+            @for (item of budgetItems(); track item.id) {
+              <div class="expense-group">
+                <div class="expense-group-header" (click)="selectBudgetItem(item)">
+                  <div class="expense-group-left">
+                    <mat-icon>{{ getCostCodeIcon(item.cost_code || '') }}</mat-icon>
+                    <span class="expense-group-code">{{ item.cost_code }}</span>
+                    <span class="expense-group-desc">{{ item.description }}</span>
+                  </div>
+                  <div class="expense-group-right">
+                    <span class="expense-group-amount">{{ formatCurrency(item.actual_amount) }}</span>
+                    <button class="action-btn btn-sm" matRipple (click)="$event.stopPropagation(); openLogExpense(item)">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Item Detail Sidebar -->
+    @if (selectedItem()) {
+      <div class="detail-overlay" (click)="closeItemDetail()"></div>
+      <div class="detail-sidebar">
+        <div class="detail-header">
+          <div>
+            <h3 class="detail-title">{{ selectedItem()?.cost_code }}</h3>
+            <p class="detail-desc">{{ selectedItem()?.description || 'No description' }}</p>
+          </div>
+          <button class="close-btn" (click)="closeItemDetail()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="detail-stats">
+          <div class="detail-stat">
+            <span class="detail-stat-label">Estimated</span>
+            <span class="detail-stat-value">{{ formatCurrency(selectedItem()?.estimated_amount) }}</span>
+          </div>
+          <div class="detail-stat">
+            <span class="detail-stat-label">Actual</span>
+            <span class="detail-stat-value">{{ formatCurrency(selectedItem()?.actual_amount) }}</span>
+          </div>
+          <div class="detail-stat">
+            <span class="detail-stat-label">Variance</span>
+            <span class="detail-stat-value" [class.positive]="(selectedItem()?.estimated_amount || 0) >= (selectedItem()?.actual_amount || 0)" [class.negative]="(selectedItem()?.estimated_amount || 0) < (selectedItem()?.actual_amount || 0)">
+              {{ formatCurrency((selectedItem()?.estimated_amount || 0) - (selectedItem()?.actual_amount || 0)) }}
+            </span>
+          </div>
+        </div>
+        <div class="detail-expenses-header">
+          <h4>Expense History</h4>
+          <button class="btn-primary btn-sm" matRipple (click)="openLogExpense(selectedItem()!)">
+            <mat-icon class="btn-icon">add</mat-icon> Log
+          </button>
+        </div>
+        <div class="detail-expenses-list">
+          @for (exp of itemExpenses(); track exp.id) {
+            <div class="expense-entry">
+              <div class="expense-entry-left">
+                <div class="expense-type-icon">
+                  <mat-icon>{{ getExpenseTypeIcon(exp.expense_type || '') }}</mat-icon>
+                </div>
+                <div class="expense-entry-info">
+                  <span class="expense-entry-type">{{ exp.expense_type }}</span>
+                  <span class="expense-entry-date">{{ formatDate(exp.date_incurred) }}</span>
+                </div>
+              </div>
+              <span class="expense-entry-amount">{{ formatCurrency(exp.amount) }}</span>
+            </div>
+          }
+          @if (itemExpenses().length === 0) {
+            <p class="no-expenses">No expenses recorded for this item.</p>
+          }
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Create Budget Dialog -->
+  @if (showCreateBudgetDialog()) {
+    <div class="dialog-overlay" (click)="showCreateBudgetDialog.set(false)"></div>
+    <div class="dialog-card">
+      <div class="dialog-header">
+        <h3>Create Project Budget</h3>
+        <button class="close-btn" (click)="showCreateBudgetDialog.set(false)"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-group">
+          <label class="form-label">Total Estimated Amount ($)</label>
+          <input type="number" class="form-input" [(ngModel)]="newBudgetAmount" placeholder="e.g. 500000" min="1">
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-cancel" (click)="showCreateBudgetDialog.set(false)">Cancel</button>
+        <button class="btn-primary" matRipple (click)="createBudget()" [disabled]="newBudgetAmount <= 0">Create Budget</button>
+      </div>
+    </div>
+  }
+
+  <!-- Add Item Dialog -->
+  @if (showAddItemDialog()) {
+    <div class="dialog-overlay" (click)="showAddItemDialog.set(false)"></div>
+    <div class="dialog-card">
+      <div class="dialog-header">
+        <h3>Add Budget Item</h3>
+        <button class="close-btn" (click)="showAddItemDialog.set(false)"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-group">
+          <label class="form-label">Cost Code</label>
+          <select class="form-input" [(ngModel)]="newItem.cost_code">
+            <option value="">Select a category…</option>
+            <option value="MATERIALS">Materials</option>
+            <option value="LABOR">Labor</option>
+            <option value="EQUIPMENT">Equipment</option>
+            <option value="SUBCONTRACT">Subcontract</option>
+            <option value="PERMITS_FEES">Permits & Fees</option>
+            <option value="OVERHEAD">Overhead</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-input" [(ngModel)]="newItem.description" placeholder="e.g. Concrete & rebar for foundations">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Estimated Amount ($)</label>
+            <input type="number" class="form-input" [(ngModel)]="newItem.estimated_amount" placeholder="0.00" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Committed Amount ($)</label>
+            <input type="number" class="form-input" [(ngModel)]="newItem.committed_amount" placeholder="0.00" min="0">
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-cancel" (click)="showAddItemDialog.set(false)">Cancel</button>
+        <button class="btn-primary" matRipple (click)="addBudgetItem()" [disabled]="!newItem.cost_code || newItem.estimated_amount <= 0">Add Item</button>
+      </div>
+    </div>
+  }
+
+  <!-- Log Expense Dialog -->
+  @if (showLogExpenseDialog()) {
+    <div class="dialog-overlay" (click)="showLogExpenseDialog.set(false)"></div>
+    <div class="dialog-card">
+      <div class="dialog-header">
+        <h3>Log Expense — {{ selectedItem()?.cost_code }}</h3>
+        <button class="close-btn" (click)="showLogExpenseDialog.set(false)"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="dialog-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Amount ($)</label>
+            <input type="number" class="form-input" [(ngModel)]="newExpense.amount" placeholder="0.00" min="0.01" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expense Type</label>
+            <select class="form-input" [(ngModel)]="newExpense.expense_type">
+              <option value="MATERIAL">Material</option>
+              <option value="LABOR">Labor</option>
+              <option value="EQUIPMENT">Equipment</option>
+              <option value="SUBCONTRACT">Subcontract</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Reference / Invoice #</label>
+            <input type="text" class="form-input" [(ngModel)]="newExpense.reference_id" placeholder="e.g. INV-2026-0042">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date Incurred</label>
+            <input type="date" class="form-input" [(ngModel)]="newExpense.date_incurred">
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-cancel" (click)="showLogExpenseDialog.set(false)">Cancel</button>
+        <button class="btn-primary" matRipple (click)="logExpense()" [disabled]="newExpense.amount <= 0">Log Expense</button>
+      </div>
+    </div>
+  }
+</div>

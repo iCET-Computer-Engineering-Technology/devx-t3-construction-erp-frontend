@@ -1,11 +1,9 @@
-/* ===== Dashboard Layout ===== */
 .dashboard {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/* ===== KPI Cards Row ===== */
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);

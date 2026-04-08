@@ -11,6 +11,7 @@ import { DashboardResponse } from '../../../../core/services/dashboard.service';
   styleUrl: './accountant-dashboard.component.css'
 })
 export class AccountantDashboardComponent {
+  
   dashboardData = input.required<DashboardResponse>();
 
   totalProjects = computed(() => this.dashboardData().totalProjects);

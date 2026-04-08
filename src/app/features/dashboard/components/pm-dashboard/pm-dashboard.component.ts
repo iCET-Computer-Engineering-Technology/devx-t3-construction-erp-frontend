@@ -11,6 +11,7 @@ import { DashboardResponse } from '../../../../core/services/dashboard.service';
   styleUrl: './pm-dashboard.component.css'
 })
 export class PmDashboardComponent {
+  
   dashboardData = input.required<DashboardResponse>();
 
   totalProjects = computed(() => this.dashboardData().totalProjects);

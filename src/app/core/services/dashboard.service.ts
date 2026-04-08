@@ -23,6 +23,7 @@ export interface StandardResponse {
   providedIn: 'root'
 })
 export class DashboardService {
+  
   private http = inject(HttpClient);
   private apiUrl = '/api/dashboard';
 

@@ -1,4 +1,5 @@
 @if (dashboardData()) {
+  
   @switch (dashboardData()!.role) {
     @case ('ADMIN') {
       <app-admin-dashboard [dashboardData]="dashboardData()!"></app-admin-dashboard>

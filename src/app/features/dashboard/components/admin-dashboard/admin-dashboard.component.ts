@@ -24,6 +24,7 @@ interface Activity {
   styleUrl: './admin-dashboard.component.css',
 })
 export class AdminDashboardComponent implements OnInit {
+  
   projectService = inject(ProjectService);
   taskService = inject(TaskService);
   procurementService = inject(ProcurementService);

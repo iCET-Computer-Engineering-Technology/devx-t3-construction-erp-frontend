@@ -23,6 +23,7 @@ import { WorkerDashboardComponent } from './components/worker-dashboard/worker-d
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
+  
   dashboardService = inject(DashboardService);
   dashboardData = signal<DashboardResponse | null>(null);
 

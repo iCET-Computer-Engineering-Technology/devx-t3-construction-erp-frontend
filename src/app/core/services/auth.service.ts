@@ -66,13 +66,11 @@ export class AuthService {
                     } else {
                         console.warn("Backend eken role eka awilla naha!");
                     }
-
-                    // save karanawa other details
+ 
                     if (response?.name) localStorage.setItem(this.nameKey, response.name);
                     if (response?.email) localStorage.setItem(this.emailKey, response.email);
                     if (response?.userId) localStorage.setItem(this.userIdKey, response.userId);
-
-                    //  update current status 
+ 
                     this.currentUserRoleSubject.next(role);
                     this.currentUserInfoSubject.next(this.buildUserInfoFromStorage());
                     
@@ -165,12 +163,10 @@ export class AuthService {
         const decoded = this.decodeToken(token);
         console.log('Decoded Token:', decoded);
         if (!decoded) return null;
-
-        // Handle various ways the role might be stored in the JWT payload from different backends
+ 
         let role = decoded.role || decoded.roles?.[0] || decoded.authority || decoded.authorities?.[0];
 
-        // TEMPORARY FIX: If the backend's JWT doesn't include a role (e.g. only contains 'sub'), default to ADMIN so you can log in.
-        console.log("Role eka : ",role);
+        console.log("Role : ",role);
         
         if (!role && decoded.sub) {
             console.warn('No role found in JWT! Defaulting to ADMIN based on sub.');

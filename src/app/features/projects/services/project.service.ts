@@ -178,7 +178,9 @@ export class ProjectService {
       project_manager_id: Number(data.managerId) || 1,
       total_budget: parseFloat((data.budgetTotal || '0').replace(/[^0-9.-]+/g, ''))
     };
-    // Backend @PostMapping is mapped to /addProject
+    
+    console.log("payload : ",payload);
+    
     this.http.post<boolean>(`${this.apiUrl}/addProject`, payload).subscribe({
       next: (success) => { if (success) this.refreshProjects(); },
       error: (err) => console.error('Failed to add project', err)

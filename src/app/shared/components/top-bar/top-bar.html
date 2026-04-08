@@ -13,16 +13,10 @@
 
   <!-- Actions -->
   <div class="top-bar-actions">
+
     <!-- Notifications -->
-    <button
-      class="action-btn"
-      matRipple
-      [matRippleCentered]="true"
-      [matRippleUnbounded]="true"
-      [matRippleRadius]="20"
-      (click)="onNotifications()"
-      aria-label="Notifications"
-    >
+    <button class="action-btn" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true"
+            [matRippleRadius]="20" (click)="onNotifications()" aria-label="Notifications">
       @if (notificationCount() > 0) {
         <mat-icon matBadge="{{ notificationCount() }}" matBadgeColor="warn" matBadgeSize="small">
           notifications_none
@@ -33,15 +27,8 @@
     </button>
 
     <!-- Messages -->
-    <button
-      class="action-btn"
-      matRipple
-      [matRippleCentered]="true"
-      [matRippleUnbounded]="true"
-      [matRippleRadius]="20"
-      (click)="onMessages()"
-      aria-label="Messages"
-    >
+    <button class="action-btn" matRipple [matRippleCentered]="true" [matRippleUnbounded]="true"
+            [matRippleRadius]="20" (click)="onMessages()" aria-label="Messages">
       @if (messageCount() > 0) {
         <mat-icon matBadge="{{ messageCount() }}" matBadgeColor="warn" matBadgeSize="small">
           chat_bubble_outline
@@ -55,8 +42,8 @@
     <div class="action-divider"></div>
 
     <!-- User Profile -->
-    <button class="user-profile" matRipple (click)="onProfile()">
-      @if (user(); as u) {
+    @if (user(); as u) {
+      <button class="user-profile" matRipple (click)="onProfile()">
         <div class="user-info">
           <span class="user-name">{{ u.name }}</span>
           <span class="user-role">{{ u.role }}</span>
@@ -68,7 +55,17 @@
             <span class="avatar-initials">{{ getUserInitials() }}</span>
           }
         </div>
-      }
-    </button>
+      </button>
+
+      <!-- Divider -->
+      <div class="action-divider"></div>
+
+      <!-- Logout Button -->
+      <button class="action-btn logout-btn" matRipple [matRippleCentered]="true"
+              [matRippleUnbounded]="true" [matRippleRadius]="20"
+              (click)="onLogout()" title="Log out" aria-label="Log out">
+        <mat-icon>logout</mat-icon>
+      </button>
+    }
   </div>
 </header>

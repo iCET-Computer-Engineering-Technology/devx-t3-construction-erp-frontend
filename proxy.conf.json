@@ -2,17 +2,5 @@
   "/api": {
     "target": "http://localhost:8080",
     "secure": false
-  },
-  "/tasks": {
-    "target": "http://localhost:8080",
-    "secure": false
-  },
-  "/projects": {
-    "target": "http://localhost:8080",
-    "secure": false
-  },
-  "/client_access": {
-    "target": "http://localhost:8080",
-    "secure": false
   }
 }

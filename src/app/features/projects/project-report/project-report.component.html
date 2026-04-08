@@ -1,0 +1,238 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-gray-900">Project Reports</h1>
+      <p class="text-gray-600 mt-1">View detailed reports for your projects</p>
+    </div>
+
+    <!-- Project Selector Card -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Select Project to View Report
+      </label>
+      <select
+        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600 outline-none transition-all"
+        [value]="selectedProjectId() || ''"
+        (change)="onProjectSelect($event)"
+        [disabled]="isLoading()">
+        <option value="" disabled selected>Choose a project...</option>
+      <option *ngFor="let project of projects()" [value]="project.id">
+          {{ project.name }} - {{ project.location }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="flex flex-col items-center justify-center py-16">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p class="text-gray-600 mt-4">Loading report...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error() && !isLoading()) {
+      <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <svg class="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Error Loading Report</h3>
+        <p class="text-gray-600 mb-4">{{ error() }}</p>
+        <button
+          (click)="retry()"
+          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Retry
+        </button>
+      </div>
+    }
+
+    <!-- Placeholder State -->
+    @if (!selectedProjectId() && !isLoading() && !error()) {
+      <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No Project Selected</h3>
+        <p class="text-gray-600">Please select a project to view its report</p>
+      </div>
+    }
+
+    <!-- Report Section -->
+    @if (report() && !isLoading() && !error()) {
+      <div class="space-y-6">
+        <!-- Project Info Card -->
+        <div class="bg-gradient-to-r from-orange-200 to-orange-200 rounded-lg shadow-lg p-6 text-white">
+          <h2 class="text-2xl font-bold mb-2 text-orange-600">{{ report()!.projectName }}</h2>
+          <span class="inline-block px-3 py-1 bg-orange-600 rounded-full text-sm font-medium uppercase">
+            {{ report()!.status }}
+          </span>
+        </div>
+
+        <!-- Budget Overview Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Total Budget -->
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Budget</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">{{ formatCurrency(report()!.totalBudget) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Expenses -->
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6  text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Expenses</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">{{ formatCurrency(report()!.totalExpenses) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Remaining Budget -->
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow" [ngClass]="{
+            'ring-2 ring-orange-500': getBudgetStatusClass() === 'budget-on-track',
+            'ring-2 ring-yellow-500': getBudgetStatusClass() === 'budget-warning',
+            'ring-2 ring-red-500': getBudgetStatusClass() === 'budget-over'
+          }">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center" [ngClass]="{
+                'bg-orange-100': getBudgetStatusClass() === 'budget-on-track',
+                'bg-yellow-100': getBudgetStatusClass() === 'budget-warning',
+                'bg-red-100': getBudgetStatusClass() === 'budget-over'
+              }">
+                <svg class="w-6 h-6" [ngClass]="{
+                  'text-orange-600': getBudgetStatusClass() === 'budget-on-track',
+                  'text-yellow-600': getBudgetStatusClass() === 'budget-warning',
+                  'text-red-600': getBudgetStatusClass() === 'budget-over'
+                }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0a3 3 0 110 6H9l3 3m-3-6h6m6 1a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Remaining Budget</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">{{ formatCurrency(report()!.remainingBudget) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Progress Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Total Tasks -->
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6  text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Tasks</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">{{ report()!.totalTasks }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Completed Tasks -->
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Completed Tasks</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">{{ report()!.completedTasks }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center" [ngClass]="{
+                'bg-orange-100': getProgressStatusClass() === 'progress-high',
+                'bg-yellow-100': getProgressStatusClass() === 'progress-medium',
+                'bg-red-100': getProgressStatusClass() === 'progress-low'
+              }">
+                <svg class="w-6 h-6" [ngClass]="{
+                  'text-orange-600': getProgressStatusClass() === 'progress-high',
+                  'text-yellow-600': getProgressStatusClass() === 'progress-medium',
+                  'text-red-600': getProgressStatusClass() === 'progress-low'
+                }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-600 uppercase tracking-wide">Progress</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">{{ formatPercentage(report()!.progressPercentage) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-900">Overall Progress</h3>
+            <span class="text-sm font-medium text-gray-600">
+              {{ report()!.completedTasks }} of {{ report()!.totalTasks }} tasks completed
+            </span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+            <div 
+              class="h-full rounded-full transition-all duration-500" 
+              [ngClass]="{
+                'bg-orange-500': report()!.progressPercentage >= 90,
+                'bg-yellow-500': report()!.progressPercentage >= 60 && report()!.progressPercentage < 90,
+                'bg-red-500': report()!.progressPercentage < 60
+              }"
+              [style.width.%]="report()!.progressPercentage">
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Budget Utilization</p>
+              <p class="text-xl font-bold text-gray-900 mt-1">
+                {{ formatPercentage((report()!.totalExpenses / report()!.totalBudget) * 100) }}
+              </p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-600">Pending Tasks</p>
+              <p class="text-xl font-bold text-gray-900 mt-1">
+                {{ report()!.totalTasks - report()!.completedTasks }}
+              </p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-600">Project ID</p>
+              <p class="text-xl font-bold text-gray-900 mt-1">{{ report()!.projectId }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+

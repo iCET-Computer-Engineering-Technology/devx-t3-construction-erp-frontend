@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskDetailComponent } from '../task-detail-component/task-detail-component';
 import { AuthService } from '../../../core/services/auth.service';
-import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-my-tasks',
@@ -18,7 +17,6 @@ import { AuthService } from '../../../core/services/auth.service';
 export class MyTasksComponent implements OnInit {
   private readonly taskService = inject(TaskService);
   private readonly dialog = inject(MatDialog);
-  private readonly authService = inject(AuthService);
   private readonly authService = inject(AuthService);
 
   tasks = signal<Task[]>([]);
@@ -40,16 +38,6 @@ export class MyTasksComponent implements OnInit {
 
   loadMyTasks() {
     const userId = this.authService.getCurrentUserId();
-    if (userId) {
-      this.taskService.getMyTasks(Number(userId)).subscribe(tasks => {
-        this.tasks.set(tasks);
-      });
-    } else {
-      // Fallback: filter all tasks client-side using the JWT email
-      const allTasks = this.taskService.tasks();
-      this.tasks.set(allTasks);
-    }
-    const userId = this.authService.getCurrentUserId();
     if (true) {
       this.taskService.getMyTasks(Number(userId)).subscribe(tasks => {
         this.tasks.set(tasks);
@@ -69,26 +57,6 @@ export class MyTasksComponent implements OnInit {
     this.dialog.open(TaskDetailComponent, {
       width: '600px',
       data: { task }
-    });
-  }
-
-  changeStatus(task: Task, newStatus: 'TODO' | 'IN_PROGRESS' | 'DONE') {
-    this.taskService.updateTaskStatus(task.taskId, newStatus).subscribe({
-      next: () => {
-        // Update the local task list immediately for responsive UI
-        const updated = this.tasks().map(t =>
-          t.taskId === task.taskId ? { ...t, status: newStatus } : t
-        );
-        this.tasks.set(updated as Task[]);
-      },
-      error: (err) => {
-        console.error('Failed to update task status', err);
-        // Fallback: update locally anyway for demo
-        const updated = this.tasks().map(t =>
-          t.taskId === task.taskId ? { ...t, status: newStatus } : t
-        );
-        this.tasks.set(updated as Task[]);
-      }
     });
   }
 

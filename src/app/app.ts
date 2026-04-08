@@ -14,8 +14,9 @@ import { UserRole } from './core/models/user.model';
 })
 export class App {
   protected readonly title = signal('construction-erp-frontend');
+  protected readonly isAuthPage = signal(true);
 
-  private router      = inject(Router);
+  private router = inject(Router);
   private authService = inject(AuthService);
 
   protected readonly currentUserRole = signal<UserRole | null>(null);
@@ -37,36 +38,41 @@ export class App {
   ];
 
   private readonly ALL_BOTTOM_NAV = [
-    { label: 'RBAC',     icon: 'admin_panel_settings', route: '/rbac',     roles: ['ADMIN'] },
-    { label: 'Settings', icon: 'settings',             route: '/settings', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT', 'WORKER'] },
+    { label: 'RBAC', icon: 'admin_panel_settings', route: '/rbac', roles: ['ADMIN'] },
+    { label: 'Settings', icon: 'settings', route: '/settings', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT', 'WORKER'] },
   ];
 
   protected readonly sidebarConfig = computed<SidebarConfig>(() => {
     const role = this.currentUserRole()?.toString() || '';
+
     return {
-      brandName:    'BuildFlow',
+      brandName: 'BuildFlow',
       brandSubtitle: 'ENTERPRISE ERP',
-      mainNav:   this.ALL_MAIN_NAV.filter(item => item.roles.includes(role)),
+      mainNav: this.ALL_MAIN_NAV.filter(item => item.roles.includes(role)),
       bottomNav: this.ALL_BOTTOM_NAV.filter(item => item.roles.includes(role)),
     };
   });
 
   protected currentUser: TopBarUser | null = null;
 
-  constructor() { 
+  constructor() {
+    // Current user ge information update karanna
     this.authService.currentUserInfo$.subscribe(info => {
       if (info) {
-        this.currentUser = { name: info.name, role: info.role };
+        this.currentUser = {
+          name: info.name,
+          role: info.role,
+        };
         this.currentUserRole.set(info.role);
       } else {
         this.currentUser = null;
         this.currentUserRole.set(null);
       }
     });
- 
+
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(e => {
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe((e) => {
         this.isAuthPage.set((e as NavigationEnd).urlAfterRedirects === '/login');
       });
   }

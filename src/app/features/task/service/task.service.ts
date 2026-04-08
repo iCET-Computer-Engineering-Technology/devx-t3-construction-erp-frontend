@@ -61,21 +61,7 @@ export class TaskService {
         this.refreshTasks();
       }
     });
-    this.loadUsersAndTasks();
   }
-
-  // private loadUsersAndTasks(): void {
-  //   this.userService.getUsers().subscribe({
-  //     next: (users) => {
-  //       (users || []).forEach((u: any) => this.usersMap.set(Number(u.userId), u.name));
-  //       this.refreshTasks();
-  //     },
-  //     error: (err) => {
-  //       console.error('Failed to load users for tasks', err);
-  //       this.refreshTasks();
-  //     }
-  //   });
-  // }
 
   refreshTasks(): void {
     this.http.get<TaskApiResponse[]>(this.apiUrl).subscribe({

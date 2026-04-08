@@ -22,7 +22,6 @@ export class DocumentsComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   readonly placeholderImage = '';
-  readonly placeholderImage = '';
 
   readonly tabs: DocumentTab[] = ['Contracts', 'Site Photos', 'Blueprints', 'Safety Logs'];
   readonly activeTab = signal<DocumentTab>('Blueprints');
@@ -133,15 +132,23 @@ export class DocumentsComponent implements OnInit {
 
   // ── Download ──
   downloadFile(file: DocumentFile): void {
-    const url = `/api/projects/${file.projectId}/documents/${file.documentId}/download`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.fileName;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    this.showToast(`Downloading "${file.fileName}"…`);
+    const url = `/api/documents/${file.projectId}/documents/${file.documentId}/download`;
+
+  this.http.get(url, { responseType: 'blob' }).subscribe({
+    next: (blob) => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = file.fileName;
+      a.click();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      this.showToast(`Downloading "${file.fileName}"…`);
+    },
+    error: () => {
+      this.showToast('Download failed');
+    }
+  });
   }
 
   // ── Share ──
@@ -191,51 +198,6 @@ export class DocumentsComponent implements OnInit {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  getFileExtension(fileName: string): string {
-    if (!fileName) return 'FILE';
-    const ext = fileName.split('.').pop()?.toUpperCase() || '';
-    return ext || 'FILE';
-  }
-
-  getDocumentStatus(doc: DocumentFile): string {
-    if (!doc.uploadedAt) return 'Pending';
-    return 'Uploaded';
-  }
-
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'Uploaded': return 'text-green-600';
-      case 'Pending': return 'text-orange-600';
-      default: return 'text-gray-600';
-    }
-  }
-
-  getPreviewIcon(fileType: string): string {
-    if (!fileType) return 'insert_drive_file';
-    const t = fileType.toLowerCase();
-    if (t.includes('pdf')) return 'picture_as_pdf';
-    if (t.includes('image') || t.includes('jpg') || t.includes('png')) return 'image';
-    if (t.includes('spreadsheet') || t.includes('xlsx') || t.includes('csv')) return 'table_chart';
-    if (t.includes('word') || t.includes('doc')) return 'article';
-    if (t.includes('zip') || t.includes('rar')) return 'folder_zip';
-    return 'description';
-  }
-
-  getPreviewIconColor(fileType: string): string {
-    if (!fileType) return '#94a3b8';
-    const t = fileType.toLowerCase();
-    if (t.includes('pdf')) return '#dc2626';
-    if (t.includes('image') || t.includes('jpg') || t.includes('png')) return '#ea580c';
-    if (t.includes('spreadsheet') || t.includes('xlsx') || t.includes('csv')) return '#16a34a';
-    if (t.includes('word') || t.includes('doc')) return '#3b82f6';
-    return '#64748b';
-  }
-
-  getProjectName(projectId: number): string {
-    const proj = this.projects().find(p => p.id === projectId);
-    return proj?.name || 'PRJ-' + projectId;
   }
 
   getFileExtension(fileName: string): string {

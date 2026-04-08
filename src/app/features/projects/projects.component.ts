@@ -133,8 +133,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.keywordSubject$.next('');
   }
 
-  // ── Pagination ────────────────────────────────────────────────────────────
-
   prevPage(): void {
     this.currentPage.update((p) => Math.max(1, p - 1));
   }
@@ -143,7 +141,6 @@ export class ProjectsComponent implements OnInit, OnDestroy {
     this.currentPage.update((p) => Math.min(this.totalPages(), p + 1));
   }
 
-  // ── Navigation & dialogs ──────────────────────────────────────────────────
 
   setTab(tab: 'active' | 'details' | 'resources'): void {
     this.activeTab.set(tab);

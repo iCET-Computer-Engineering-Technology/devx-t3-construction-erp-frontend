@@ -66,8 +66,7 @@ export class AuthService {
                     } else {
                         console.warn("Backend eken role eka awilla naha!");
                     }
-
-                    // save karanawa other details
+ 
                     if (response?.name) localStorage.setItem(this.nameKey, response.name);
                     if (response?.email) localStorage.setItem(this.emailKey, response.email);
                     if (response?.userId) localStorage.setItem(this.userIdKey, response.userId);
@@ -106,11 +105,9 @@ export class AuthService {
         const token = this.getToken();
         if (!token) return false;
 
-        // Skip expiry check if it's our dummy session token
         if (token === 'session-active') return true;
 
-        // Check if token is expired (basic check)
-        const payload = this.decodeToken(token);
+         const payload = this.decodeToken(token);
         if (payload && payload.exp) {
             if (Math.floor(Date.now() / 1000) >= payload.exp) {
                 this.logout();
@@ -167,12 +164,10 @@ export class AuthService {
         const decoded = this.decodeToken(token);
         console.log('Decoded Token:', decoded);
         if (!decoded) return null;
-
-        // Handle various ways the role might be stored in the JWT payload from different backends
+ 
         let role = decoded.role || decoded.roles?.[0] || decoded.authority || decoded.authorities?.[0];
 
-        // TEMPORARY FIX: If the backend's JWT doesn't include a role (e.g. only contains 'sub'), default to ADMIN so you can log in.
-        console.log("Role eka : ",role);
+        console.log("Role : ",role);
         
         if (!role && decoded.sub) {
             console.warn('No role found in JWT! Defaulting to ADMIN based on sub.');

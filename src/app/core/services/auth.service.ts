@@ -70,7 +70,12 @@ export class AuthService {
                     if (response?.name) localStorage.setItem(this.nameKey, response.name);
                     if (response?.email) localStorage.setItem(this.emailKey, response.email);
                     if (response?.userId) localStorage.setItem(this.userIdKey, response.userId);
+<<<<<<< HEAD
  
+=======
+
+                    //  update current status 
+>>>>>>> 4eb7b9a46440a463736683fab7b8b6c3a4ca3927
                     this.currentUserRoleSubject.next(role);
                     this.currentUserInfoSubject.next(this.buildUserInfoFromStorage());
                     

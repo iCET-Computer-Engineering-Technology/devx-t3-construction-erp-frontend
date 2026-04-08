@@ -20,25 +20,20 @@ export class App {
 
   protected readonly currentUserRole = signal<UserRole | null>(null);
 
-  // Read the URL immediately so a hard-refresh at /dashboard
-  // never flashes the wrong layout.
-  protected readonly isAuthPage = signal<boolean>(
-    window.location.pathname === '/login'
-  );
-
   private readonly ALL_MAIN_NAV = [
-    { label: 'Dashboard',  icon: 'dashboard',              route: '/dashboard', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT', 'WORKER'] },
-    { label: 'My Tasks',   icon: 'assignment',             route: '/my-tasks',  roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
-    { label: 'Projects',   icon: 'folder_open',            route: '/projects',  roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
-    { label: 'Tasks',      icon: 'task_alt',               route: '/tasks',     roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
-    { label: 'WBS',        icon: 'account_tree',           route: '/wbs',       roles: ['ADMIN', 'PROJECT_MANAGER'] },
-    { label: 'Progress',   icon: 'timeline',               route: '/progress',  roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
-    { label: 'Equipment',  icon: 'construction',           route: '/equipment', roles: ['ADMIN', 'SITE_ENGINEER'] },
-    { label: 'Workforce',  icon: 'groups',                 route: '/workforce', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
-    { label: 'Budget',     icon: 'account_balance_wallet', route: '/budget',    roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
-    { label: 'Documents',  icon: 'description',            route: '/documents', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
-    { label: 'Reports',    icon: 'assessment',             route: '/reports',   roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
-    { label: 'Users',      icon: 'manage_accounts',        route: '/users',     roles: ['ADMIN'] },
+    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT', 'WORKER'] },
+    { label: 'My Tasks', icon: 'assignments', route: '/my-tasks', roles: ['PROJECT_MANAGER', 'SITE_ENGINEER', 'WORKER'] },
+    { label: 'Projects', icon: 'folder_open', route: '/projects', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
+    { label: 'Tasks', icon: 'task_alt', route: '/tasks', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
+    { label: 'WBS', icon: 'account_tree', route: '/wbs', roles: ['ADMIN', 'PROJECT_MANAGER'] },
+    { label: 'Procurement', icon: 'timeline', route: '/procurement', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
+    { label: 'Equipment', icon: 'construction', route: '/equipment', roles: ['ADMIN', 'SITE_ENGINEER'] },
+    { label: 'Workforce', icon: 'groups', route: '/workforce', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER'] },
+    { label: 'Budget', icon: 'account_balance_wallet', route: '/budget', roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
+    { label: 'Documents', icon: 'description', route: '/documents', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
+    { label: 'Reports', icon: 'assessment', route: '/reports', roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
+    { label: 'Users', icon: 'manage_accounts', route: '/users', roles: ['ADMIN',] },
+
   ];
 
   private readonly ALL_BOTTOM_NAV = [
@@ -74,8 +69,17 @@ export class App {
       .subscribe(e => {
         this.isAuthPage.set((e as NavigationEnd).urlAfterRedirects === '/login');
       });
-  } 
-  onLogout(): void {
+  }
+
+  logout(): void {
     this.authService.logout();
   }
+
+  // constructor() {
+  //   this.router.events
+  //     .pipe(filter((e) => e instanceof NavigationEnd))
+  //     .subscribe((e) => {
+  //       this.isAuthPage.set((e as NavigationEnd).urlAfterRedirects === '/login');
+  //     });
+  // }
 }

@@ -32,11 +32,13 @@ interface TaskApiResponse {
 
 import { UserService } from '../../../core/services/user.service';
 
+// import { UserService } from '../../../core/services/user.service';
+
 @Injectable({ providedIn: 'root' })
 export class TaskService {
   private readonly http = inject(HttpClient);
   private readonly userService = inject(UserService);
-  private readonly apiUrl = '/tasks';
+  private readonly apiUrl = '/api/tasks';
   
   private readonly tasksSignal = signal<Task[]>([]);
   private usersMap = new Map<number, string>();
@@ -59,7 +61,21 @@ export class TaskService {
         this.refreshTasks();
       }
     });
+    this.loadUsersAndTasks();
   }
+
+  // private loadUsersAndTasks(): void {
+  //   this.userService.getUsers().subscribe({
+  //     next: (users) => {
+  //       (users || []).forEach((u: any) => this.usersMap.set(Number(u.userId), u.name));
+  //       this.refreshTasks();
+  //     },
+  //     error: (err) => {
+  //       console.error('Failed to load users for tasks', err);
+  //       this.refreshTasks();
+  //     }
+  //   });
+  // }
 
   refreshTasks(): void {
     this.http.get<TaskApiResponse[]>(this.apiUrl).subscribe({

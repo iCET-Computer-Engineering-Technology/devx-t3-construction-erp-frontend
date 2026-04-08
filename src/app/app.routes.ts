@@ -2,8 +2,6 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-    // Root: always go to login first — LoginComponent will redirect
-    // away immediately if the user already has a valid session.
     { path: '', redirectTo: '/login', pathMatch: 'full' },
     {
         path: 'login',
@@ -58,6 +56,12 @@ export const routes: Routes = [
         path: 'documents',
         loadComponent: () => import('./features/documents/documents.component').then(c => c.DocumentsComponent),
         canActivate: [authGuard]
-    }, 
-    { path: '**', redirectTo: '/login' }
+    },
+    {
+        path: 'equipment',
+        loadComponent: () => import('./features/equipment/equipment-list/equipment-list').then(c => c.EquipmentListComponent),
+        canActivate: [authGuard]
+
+    },
+    { path: '**', redirectTo: '/dashboard' }
 ];

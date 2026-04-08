@@ -7,6 +7,7 @@ import { DocumentService } from './services/document.service';
 import { ProjectService } from '../projects/services/project.service';
 import { DocumentFile, DocumentTab } from './models/document.model';
 import { DocumentUploadDialogComponent } from './document-upload-dialog.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-documents',
@@ -20,6 +21,7 @@ export class DocumentsComponent implements OnInit {
   private projectService = inject(ProjectService);
   private dialog = inject(MatDialog);
 
+  readonly placeholderImage = '';
   readonly placeholderImage = '';
 
   readonly tabs: DocumentTab[] = ['Contracts', 'Site Photos', 'Blueprints', 'Safety Logs'];
@@ -38,6 +40,8 @@ export class DocumentsComponent implements OnInit {
       this.selectProject(projList[0].id);
     }
   }
+
+  constructor(private http: HttpClient) {}
 
   selectProject(projectId: number): void {
     this.selectedProjectId.set(projectId);
@@ -187,6 +191,51 @@ export class DocumentsComponent implements OnInit {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  getFileExtension(fileName: string): string {
+    if (!fileName) return 'FILE';
+    const ext = fileName.split('.').pop()?.toUpperCase() || '';
+    return ext || 'FILE';
+  }
+
+  getDocumentStatus(doc: DocumentFile): string {
+    if (!doc.uploadedAt) return 'Pending';
+    return 'Uploaded';
+  }
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'Uploaded': return 'text-green-600';
+      case 'Pending': return 'text-orange-600';
+      default: return 'text-gray-600';
+    }
+  }
+
+  getPreviewIcon(fileType: string): string {
+    if (!fileType) return 'insert_drive_file';
+    const t = fileType.toLowerCase();
+    if (t.includes('pdf')) return 'picture_as_pdf';
+    if (t.includes('image') || t.includes('jpg') || t.includes('png')) return 'image';
+    if (t.includes('spreadsheet') || t.includes('xlsx') || t.includes('csv')) return 'table_chart';
+    if (t.includes('word') || t.includes('doc')) return 'article';
+    if (t.includes('zip') || t.includes('rar')) return 'folder_zip';
+    return 'description';
+  }
+
+  getPreviewIconColor(fileType: string): string {
+    if (!fileType) return '#94a3b8';
+    const t = fileType.toLowerCase();
+    if (t.includes('pdf')) return '#dc2626';
+    if (t.includes('image') || t.includes('jpg') || t.includes('png')) return '#ea580c';
+    if (t.includes('spreadsheet') || t.includes('xlsx') || t.includes('csv')) return '#16a34a';
+    if (t.includes('word') || t.includes('doc')) return '#3b82f6';
+    return '#64748b';
+  }
+
+  getProjectName(projectId: number): string {
+    const proj = this.projects().find(p => p.id === projectId);
+    return proj?.name || 'PRJ-' + projectId;
   }
 
   getFileExtension(fileName: string): string {

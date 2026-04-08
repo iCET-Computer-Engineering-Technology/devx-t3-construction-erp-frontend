@@ -35,7 +35,7 @@ export interface Expense {
 })
 export class BudgetService {
   private http = inject(HttpClient);
-  private apiUrl = '/api';
+  private apiUrl = '/api/budget';
 
   createBudget(projectId: number, budget: Budget): Observable<number> {
     return this.http.post<number>(`${this.apiUrl}/projects/${projectId}/budget`, budget);

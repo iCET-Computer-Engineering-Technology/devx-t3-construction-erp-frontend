@@ -12,7 +12,7 @@
         Select Project to View Report
       </label>
       <select
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600 outline-none transition-all"
         [value]="selectedProjectId() || ''"
         (change)="onProjectSelect($event)"
         [disabled]="isLoading()">
@@ -65,9 +65,9 @@
     @if (report() && !isLoading() && !error()) {
       <div class="space-y-6">
         <!-- Project Info Card -->
-        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
-          <h2 class="text-2xl font-bold mb-2">{{ report()!.projectName }}</h2>
-          <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium uppercase">
+        <div class="bg-gradient-to-r from-orange-200 to-orange-200 rounded-lg shadow-lg p-6 text-white">
+          <h2 class="text-2xl font-bold mb-2 text-orange-600">{{ report()!.projectName }}</h2>
+          <span class="inline-block px-3 py-1 bg-orange-600 rounded-full text-sm font-medium uppercase">
             {{ report()!.status }}
           </span>
         </div>
@@ -77,8 +77,8 @@
           <!-- Total Budget -->
           <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-              <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                 </svg>
               </div>
@@ -92,8 +92,8 @@
           <!-- Total Expenses -->
           <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-              <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6  text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
                 </svg>
               </div>
@@ -106,18 +106,18 @@
 
           <!-- Remaining Budget -->
           <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow" [ngClass]="{
-            'ring-2 ring-green-500': getBudgetStatusClass() === 'budget-on-track',
+            'ring-2 ring-orange-500': getBudgetStatusClass() === 'budget-on-track',
             'ring-2 ring-yellow-500': getBudgetStatusClass() === 'budget-warning',
             'ring-2 ring-red-500': getBudgetStatusClass() === 'budget-over'
           }">
             <div class="flex items-center gap-4">
               <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center" [ngClass]="{
-                'bg-green-100': getBudgetStatusClass() === 'budget-on-track',
+                'bg-orange-100': getBudgetStatusClass() === 'budget-on-track',
                 'bg-yellow-100': getBudgetStatusClass() === 'budget-warning',
                 'bg-red-100': getBudgetStatusClass() === 'budget-over'
               }">
                 <svg class="w-6 h-6" [ngClass]="{
-                  'text-green-600': getBudgetStatusClass() === 'budget-on-track',
+                  'text-orange-600': getBudgetStatusClass() === 'budget-on-track',
                   'text-yellow-600': getBudgetStatusClass() === 'budget-warning',
                   'text-red-600': getBudgetStatusClass() === 'budget-over'
                 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,8 +137,8 @@
           <!-- Total Tasks -->
           <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-              <div class="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6  text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
               </div>
@@ -152,8 +152,8 @@
           <!-- Completed Tasks -->
           <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
-              <div class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
@@ -168,14 +168,14 @@
           <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
             <div class="flex items-center gap-4">
               <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center" [ngClass]="{
-                'bg-green-100': getProgressStatusClass() === 'progress-high',
+                'bg-orange-100': getProgressStatusClass() === 'progress-high',
                 'bg-yellow-100': getProgressStatusClass() === 'progress-medium',
-                'bg-blue-100': getProgressStatusClass() === 'progress-low'
+                'bg-red-100': getProgressStatusClass() === 'progress-low'
               }">
                 <svg class="w-6 h-6" [ngClass]="{
-                  'text-green-600': getProgressStatusClass() === 'progress-high',
+                  'text-orange-600': getProgressStatusClass() === 'progress-high',
                   'text-yellow-600': getProgressStatusClass() === 'progress-medium',
-                  'text-blue-600': getProgressStatusClass() === 'progress-low'
+                  'text-red-600': getProgressStatusClass() === 'progress-low'
                 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
@@ -200,9 +200,9 @@
             <div 
               class="h-full rounded-full transition-all duration-500" 
               [ngClass]="{
-                'bg-green-500': report()!.progressPercentage >= 90,
+                'bg-orange-500': report()!.progressPercentage >= 90,
                 'bg-yellow-500': report()!.progressPercentage >= 60 && report()!.progressPercentage < 90,
-                'bg-blue-500': report()!.progressPercentage < 60
+                'bg-red-500': report()!.progressPercentage < 60
               }"
               [style.width.%]="report()!.progressPercentage">
             </div>

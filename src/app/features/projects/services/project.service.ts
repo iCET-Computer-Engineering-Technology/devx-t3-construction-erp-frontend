@@ -4,6 +4,7 @@ import type { Project } from '../models/project.model';
 import { UserService } from '../../../core/services/user.service';
 import { TaskService } from '../../task/service/task.service';
 import { map, Observable } from 'rxjs';
+import { ProjectReportResponse } from '../../../core/models/report.model';
 
 export interface ProjectSearchParams {
   keyword?: string;
@@ -235,5 +236,9 @@ export class ProjectService {
       { projectRoleLable: newRoleLabel },
       { headers: { 'User-Id': currentUserId.toString() } }
     );
+  }
+
+  getProjectReport(id: number): Observable<ProjectReportResponse> {
+    return this.http.get<ProjectReportResponse>(`http://localhost:8080/api/projects/${id}/report`);
   }
 }

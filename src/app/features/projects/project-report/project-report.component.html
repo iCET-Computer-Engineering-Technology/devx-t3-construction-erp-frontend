@@ -17,7 +17,7 @@
         (change)="onProjectSelect($event)"
         [disabled]="isLoading()">
         <option value="" disabled selected>Choose a project...</option>
-        <option *ngFor="let project of projects()" [value]="project.id">
+      <option *ngFor="let project of projects()" [value]="project.id">
           {{ project.name }} - {{ project.location }}
         </option>
       </select>

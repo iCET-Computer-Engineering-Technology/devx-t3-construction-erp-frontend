@@ -64,7 +64,9 @@ export class ProjectReportComponent implements OnInit {
   }
 
   onProjectSelect(event: any): void {
-    const selectedId = Number(event.value);
+
+    const selectedValue = event.target.value;
+    const selectedId = Number(selectedValue);
     
     if (!selectedId || isNaN(selectedId)) {
       this.error.set('Invalid project selection');
@@ -76,6 +78,7 @@ export class ProjectReportComponent implements OnInit {
   }
 
   private loadReport(id: number): void {
+   
     this.isLoading.set(true);
     this.error.set(null);
     this.report.set(null);

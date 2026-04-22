@@ -1,0 +1,52 @@
+<div class="activity-container">
+
+  <div class="header">
+    <h2>Activity Logs</h2>
+    <p>Track all system actions and changes</p>
+  </div>
+
+  <div class="filters">
+    <select [(ngModel)]="selectedModule" (change)="loadLogs()">
+      <option value="">All Modules</option>
+      <option value="TASKS">Tasks</option>
+      <option value="PROJECTS">Projects</option>
+      <option value="BUDGET">Budget</option>
+    </select>
+
+    <input type="text" placeholder="Search..." [(ngModel)]="searchText">
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Action</th>
+          <th>Description</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let log of filterLogs">
+          <td>{{ log.userId }}</td>
+
+          <td>
+            <span class="badge" [ngClass]="log.action.toLowerCase()">
+              {{ log.action }}
+            </span>
+          </td>
+
+          <td>{{ log.description }}</td>
+
+          <td>{{ log.createdAt | date:'medium' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="logs.length === 0" class="no-data">
+      No activity logs found
+    </div>
+  </div>
+
+</div>

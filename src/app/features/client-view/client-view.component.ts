@@ -26,7 +26,7 @@ export class ClientViewComponent implements OnInit {
     if (token) {
 
       const projectId = 1;
-      
+       
       this.clientService.getProjectDetails(projectId, token).subscribe({
         next: (data) => {
           this.projectData = data; 

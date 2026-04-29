@@ -1,0 +1,85 @@
+.activity-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.header p {
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filters select,
+.filters input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.table-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f4f6f8;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+tr {
+  border-bottom: 1px solid #eee;
+}
+
+tbody tr:hover {
+  background: #f9fafb;
+}
+
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.badge.create {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge.update {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.badge.delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}

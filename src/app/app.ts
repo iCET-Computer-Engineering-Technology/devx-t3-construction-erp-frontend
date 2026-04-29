@@ -34,6 +34,7 @@ export class App {
     { label: 'Documents', icon: 'description', route: '/documents', roles: ['ADMIN', 'PROJECT_MANAGER', 'SITE_ENGINEER', 'ACCOUNTANT'] },
     { label: 'Reports', icon: 'assessment', route: '/reports', roles: ['ADMIN', 'PROJECT_MANAGER', 'ACCOUNTANT'] },
     { label: 'Users', icon: 'manage_accounts', route: '/users', roles: ['ADMIN',] },
+    { label: 'Activity Logs', route: '/activity-logs', icon: 'history', roles: ['ADMIN', 'PROJECT_MANAGER'] },
 
   ];
 

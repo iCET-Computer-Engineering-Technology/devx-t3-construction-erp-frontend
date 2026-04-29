@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { ActivityLogsComponent } from './pages/activity-logs/activity-logs';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -66,7 +67,14 @@ export const routes: Routes = [
         path: 'equipment',
         loadComponent: () => import('./features/equipment/equipment-list/equipment-list').then(c => c.EquipmentListComponent),
         canActivate: [authGuard]
-
     },
-    { path: '**', redirectTo: '/dashboard' }
+    {
+        path: 'activity-logs',
+        component: ActivityLogsComponent
+    },
+    { path: '**', redirectTo: '/dashboard' 
+
+    }
+
+    
 ];

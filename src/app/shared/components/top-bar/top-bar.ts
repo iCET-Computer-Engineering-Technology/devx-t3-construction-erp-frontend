@@ -18,15 +18,16 @@ export interface TopBarUser {
   styleUrl: './top-bar.css',
 })
 export class TopBarComponent {
-  user = input<TopBarUser | null>(null);
-  searchPlaceholder = input<string>('Search projects, tasks, or resources...');
-  notificationCount = input<number>(0);
-  messageCount = input<number>(0);
+  user                = input<TopBarUser | null>(null);
+  searchPlaceholder   = input<string>('Search projects, tasks, or resources...');
+  notificationCount   = input<number>(0);
+  messageCount        = input<number>(0);
 
-  searchChange = output<string>();
+  searchChange         = output<string>();
   notificationsClicked = output<void>();
-  messagesClicked = output<void>();
-  profileClicked = output<void>();
+  messagesClicked      = output<void>();
+  profileClicked       = output<void>();
+  logoutClicked        = output<void>();   // ← new
 
   protected searchValue = '';
 
@@ -35,26 +36,14 @@ export class TopBarComponent {
     this.searchChange.emit(value);
   }
 
-  onNotifications(): void {
-    this.notificationsClicked.emit();
-  }
-
-  onMessages(): void {
-    this.messagesClicked.emit();
-  }
-
-  onProfile(): void {
-    this.profileClicked.emit();
-  }
+  onNotifications(): void { this.notificationsClicked.emit(); }
+  onMessages():      void { this.messagesClicked.emit(); }
+  onProfile():       void { this.profileClicked.emit(); }
+  onLogout():        void { this.logoutClicked.emit(); }   // ← new
 
   protected getUserInitials(): string {
     const name = this.user()?.name;
     if (!name) return '?';
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 }

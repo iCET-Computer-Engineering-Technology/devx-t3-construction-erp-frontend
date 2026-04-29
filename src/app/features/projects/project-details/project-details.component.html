@@ -29,8 +29,8 @@
         <div class="detail-stat">
           <span class="stat-label">RISK LEVEL</span>
           <span class="stat-value risk-badge" [class]="'risk-' + sp.riskLevel.toLowerCase()">
-              {{ sp.riskLevel }}
-            </span>
+            {{ sp.riskLevel }}
+          </span>
         </div>
         <div class="detail-stat">
           <span class="stat-label">TOTAL SUBCONTRACTORS</span>
@@ -87,13 +87,11 @@
         <mat-icon class="address-icon">near_me</mat-icon>
       </div>
     </div>
-  </div> <div style="margin-top: 24px;">
-  <app-project-budget [projectId]="projectId()"></app-project-budget>
-</div>
-
+  </div>
   <div style="margin-top: 24px;">
     <app-project-budget [projectId]="projectId()"></app-project-budget>
   </div>
+
   <div style="margin-top: 24px;">
     <app-project-progress [projectId]="projectId()"></app-project-progress>
   </div>

@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../services/project.service';
-import { ProjectReport } from '../../../core/models/report.model';
+import { ProjectReport } from '../models/report.model';
 import { Project } from '../models/project.model';
 
 @Component({

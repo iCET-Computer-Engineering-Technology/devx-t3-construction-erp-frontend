@@ -315,6 +315,9 @@
 .modal-content {
   background: #ffffff;
   width: 520px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
   border-radius: 16px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -333,6 +336,7 @@
   align-items: center;
   padding: 24px 28px;
   border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
@@ -365,6 +369,7 @@
 
 .modal-body {
   padding: 28px;
+  overflow-y: auto;
 }
 
 .form-group {
@@ -474,6 +479,9 @@ select.form-select {
   flex-direction: column;
   gap: 10px;
   margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
 .added-item {
@@ -549,6 +557,7 @@ select.form-select {
   display: flex;
   justify-content: flex-end;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .btn-cancel {

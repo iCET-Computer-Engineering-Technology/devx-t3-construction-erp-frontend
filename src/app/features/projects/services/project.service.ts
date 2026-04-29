@@ -4,7 +4,7 @@ import type { Project } from '../models/project.model';
 import { UserService } from '../../../core/services/user.service';
 import { TaskService } from '../../task/service/task.service';
 import { map, Observable } from 'rxjs';
-import { ProjectReportResponse } from '../../../core/models/report.model';
+import { ProjectReportResponse } from '../models/report.model';
 
 export interface ProjectSearchParams {
   keyword?: string;

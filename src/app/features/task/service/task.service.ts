@@ -82,6 +82,15 @@ export class TaskService {
     return this.http.post<unknown>(this.apiUrl, body).pipe(tap(() => this.refreshTasks()));
   }
 
+  updateTask(taskId: number, payload: Partial<CreateTaskPayload>) {
+    const body = this.mapToApi(payload as CreateTaskPayload);
+    // Remove undefined fields if it's a partial update
+    Object.keys(body).forEach(key => body[key as keyof typeof body] === undefined && delete body[key as keyof typeof body]);
+    return this.http.put<unknown>(`${this.apiUrl}/${taskId}`, body).pipe(
+      tap(() => this.refreshTasks())
+    );
+  }
+
   updateTaskStatus(taskId: number, newStatus: Task['status']) {
     return this.http.patch<unknown>(`${this.apiUrl}/${taskId}`, { status: newStatus }).pipe(
       tap(() => this.refreshTasks())

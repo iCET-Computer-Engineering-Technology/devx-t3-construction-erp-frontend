@@ -49,6 +49,11 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
+        path: 'tasks/:id/edit',
+        loadComponent: () => import('./features/task/edit-task-form').then(c => c.EditTaskFormComponent),
+        canActivate: [authGuard]
+    },
+    {
         path: 'procurement',
         loadComponent: () => import('./features/procurement/procurement.component').then(c => c.ProcurementComponent),
         canActivate: [authGuard]

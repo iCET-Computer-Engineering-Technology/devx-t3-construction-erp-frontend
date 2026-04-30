@@ -7,6 +7,8 @@ import { ProjectService } from '../projects/services/project.service';
 import { MatDialog } from '@angular/material/dialog';
 import { TaskDetailComponent } from './task-detail-component/task-detail-component';
 import type { Task, TaskPriority, TaskStatus } from './model/task.model';
+import { AuthService } from '../../core/services/auth.service';
+import { UserRole } from '../../core/models/user.model';
 
 @Component({
     selector: "app-tasks",
@@ -21,11 +23,23 @@ export class TasksComponent {
     private readonly taskService = inject(TaskService);
     private readonly projectService = inject(ProjectService);
     private readonly dialog = inject(MatDialog);
+    private readonly authService = inject(AuthService);
+
+    readonly currentRole = signal<UserRole | null>(null);
 
     readonly tasks = this.taskService.tasks;
     readonly projects = this.projectService.projects;
     
+    constructor() {
+        this.authService.currentUserRole$.subscribe(role => this.currentRole.set(role));
+    }
+    
     readonly selectedProjectId = signal<number | null>(null);
+
+    readonly canEditTask = computed(() => {
+        const role = this.currentRole();
+        return role === UserRole.ADMIN || role === UserRole.PROJECT_MANAGER;
+    });
 
     readonly projectsWithTasks = computed(() => {
         const selectedId = this.selectedProjectId();
@@ -55,6 +69,10 @@ export class TasksComponent {
 
     openTaskDetail(task: Task) {
         this.selectedTask.set(task);
+    }
+
+    editTask(task: Task) {
+        this.router.navigate(['/tasks', task.taskId, 'edit']);
     }
 
     closeTaskDetail() {
